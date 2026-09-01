@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="rounded-[3px] border border-[#d9d3c4] bg-white px-[22px] py-5 shadow-sm">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold text-[#1e3f3d] m-0">Employees</h2>
+        <a href="{{ url_for('employees.new_employee') }}" class="px-4 py-2 bg-[#1e3f3d] text-white rounded-md text-sm font-medium hover:bg-[#16302d] transition-colors no-underline">+ Add New Employee</a>
+    </div>
+    {% if employees %}
+    <div class="mb-4">
+        <input type="text" id="search-filter" placeholder="Search by employee name or employee number..."
+            class="w-full md:w-64 px-3 py-2 border border-[#d9d3c4] rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#2f5d5a]">
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse" id="employees-table">
+            <thead>
+                <tr class="bg-white">
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Employee #</th>
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Name</th>
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Dept</th>
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Hire Date</th>
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">FTE Start Date</th>
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Probation End</th>
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in employees %}
+                <tr class="hover:bg-gray-50 transition-colors employee-row" data-employee="{{ e.name.lower() }}"
+                    data-employee-number="{{ (e.employee_number or '').lower() }}">
+                    <td class="px-4 py-3 text-sm border-b ">{{ e.employee_number or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b ">{{ e.name }}</td>
+                    <td class="px-4 py-3 text-sm border-b ">{{ e.office or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b ">{{ e.hire_date or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b ">{{ e.fte_probation_end or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b ">
+                        <div class="flex gap-3 items-center">
+                            <a href="{{ url_for('employees.edit_employee', emp_id=e.id) }}" title="Edit employee"
+                                class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors no-underline">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </a>
+                            <form method="post" action="{{ url_for('employees.remove_employee', emp_id=e.id) }}"
+                                onsubmit="return confirm('Remove this employee?');" style="display:inline;">
+                                <button type="submit" title="Delete employee"
+                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors border-none cursor-pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path
+                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                        </path>
+                                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+</div>
+<script>
+  // Fuzzy search
+  function fuzzyMatch(searchStr, targetStr) {
+    const search = searchStr.toLowerCase();
+    const target = targetStr.toLowerCase();
+    
+    if (search === '') return true;
+    if (target.includes(search)) return true;
+    
+    let searchIndex = 0;
+    for (let i = 0; i < target.length && searchIndex < search.length; i++) {
+      if (target[i] === search[searchIndex]) {
+        searchIndex++;
+      }
+    }
+    return searchIndex === search.length;
+  }
+
+  function updateFilter() {
+    const searchInput = document.getElementById('search-filter');
+    const searchValue = searchInput.value.trim();
+    const rows = document.querySelectorAll('.employee-row');
+    
+    rows.forEach(row => {
+      const employeeName = row.getAttribute('data-employee');
+      const employeeNumber = row.getAttribute('data-employee-number');
+      if (fuzzyMatch(searchValue, employeeName) || fuzzyMatch(searchValue, employeeNumber)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+  
+  document.getElementById('search-filter').addEventListener('input', updateFilter);
+</script>
+{% endblock %}

@@ -1,13 +1,27 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leave App</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body>
-  <h1 class="text-3xl font-bold underline">
-    Hello world!
-  </h1>
+<body class="m-0 bg-[#f6f4ef] text-[#1f2a2e] font-sans text-[14px] leading-6 antialiased">
+  <header class="flex items-baseline justify-between border-b-[3px] border-[#b5772f] bg-[#1e3f3d] px-8 py-5 text-[#f6f4ef]">
+    <h1 class="m-0 text-[19px] font-semibold uppercase tracking-[0.04em]">Leave App</h1>
+  </header>
+
+  <nav class="flex flex-wrap gap-[2px] bg-[#1e3f3d] px-8">
+        <a class="inline-block border-b-[3px] border-transparent px-[18px] py-[10px] text-[13px] tracking-[0.03em] text-[#c9d6d4] no-underline transition-colors duration-150 hover:text-white {{ 'text-white border-[#b5772f]' if request.path.startswith('/employees') else '' }}" href="{{ url_for('employees.employees') }}">Employees</a>
+        {#
+        <a class="inline-block border-b-[3px] border-transparent px-[18px] py-[10px] text-[13px] tracking-[0.03em] text-[#c9d6d4] no-underline transition-colors duration-150 hover:text-white {{ 'text-white border-[#b5772f]' if request.path == '/' else '' }}" href="{{ url_for('balance.balance') }}">Balance</a>
+        <a class="inline-block border-b-[3px] border-transparent px-[18px] py-[10px] text-[13px] tracking-[0.03em] text-[#c9d6d4] no-underline transition-colors duration-150 hover:text-white {{ 'text-white border-[#b5772f]' if request.path.startswith('/form') else '' }}" href="{{ url_for('form.form') }}">Form</a>
+        <a class="inline-block border-b-[3px] border-transparent px-[18px] py-[10px] text-[13px] tracking-[0.03em] text-[#c9d6d4] no-underline transition-colors duration-150 hover:text-white {{ 'text-white border-[#b5772f]' if request.path.startswith('/logs') else '' }}" href="{{ url_for('history.history') }}">History</a>
+        #}
+  </nav>
+
+  <main class="mx-auto my-7 max-w-[1340px] px-6">
+    {% block content %}{% endblock %}
+  </main>
 </body>
 </html>

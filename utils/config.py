@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 CONFIG_PATH = "./config.json"
 
@@ -24,6 +25,11 @@ def get_db_path(config_path=CONFIG_PATH):
     except json.JSONDecodeError:
         print(f"Invalid JSON in config file: {config_path}")
         return None
+
+def get_database_uri():
+    db_path = get_db_path()
+
+    return f"sqlite:///{Path(db_path).resolve()}"
 
 def get_form_path(config_path=CONFIG_PATH):
     try:
