@@ -1,0 +1,4 @@
+{
+    "DATABASE": "./certificates.db",
+    "FORM": "./leave_requeste_template.pdf"
+}
