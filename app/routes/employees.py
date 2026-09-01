@@ -12,3 +12,7 @@ def employees():
 @employees_bp.route("/employees/new")
 def new_employee():
     return render_template("new_employee.html")
+
+@employees_bp.route("/employees/add", methods=["POST"])
+def add_employee_submit():
+    pass

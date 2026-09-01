@@ -67,8 +67,11 @@
                 {% endfor %}
         </table>
     </div>
+    {% else %}
+        <p class="text-gray-500 italic">No employees yet.</p>
     {% endif %}
 </div>
+
 <script>
   // Fuzzy search
   function fuzzyMatch(searchStr, targetStr) {
