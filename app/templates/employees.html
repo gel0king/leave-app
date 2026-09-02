@@ -29,12 +29,13 @@
                 {% for e in employees %}
                 <tr class="hover:bg-gray-50 transition-colors employee-row" data-employee="{{ e.name.lower() }}"
                     data-employee-number="{{ e.employee_number }}">
-                    <td class="px-4 py-3 text-sm border-b ">{{ e.employee_number or "" }}</td>
-                    <td class="px-4 py-3 text-sm border-b ">{{ e.name }}</td>
-                    <td class="px-4 py-3 text-sm border-b ">{{ e.office or "" }}</td>
-                    <td class="px-4 py-3 text-sm border-b ">{{ e.hire_date or "" }}</td>
-                    <td class="px-4 py-3 text-sm border-b ">{{ e.fte_probation_end or "" }}</td>
-                    <td class="px-4 py-3 text-sm border-b ">
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.employee_number or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.name }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.office or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.start_date or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.employment_date or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.probation_end_date or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">
                         <div class="flex gap-3 items-center">
                             <a href="{{ url_for('employees.edit_employee', emp_id=e.id) }}" title="Edit employee"
                                 class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors no-underline">
