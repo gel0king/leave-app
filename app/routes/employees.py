@@ -162,10 +162,12 @@ def add_employee_submit():
         url_for("employees.employees")
     ) 
 
+# TODO: Implement Edit Page
 @employees_bp.route("/employees/<int:emp_id>/edit")
 def edit_employee(emp_id):
     return render_template("employees.html")
 
+# TODO: Emplement soft delete for employees.(Mark as inactive)
 @employees_bp.route("/employees/<int:emp_id>/remove", methods=["POST"])
 def remove_employee(emp_id):
     return render_template("employees.html")
