@@ -28,7 +28,7 @@
             <tbody>
                 {% for e in employees %}
                 <tr class="hover:bg-gray-50 transition-colors employee-row" data-employee="{{ e.name.lower() }}"
-                    data-employee-number="{{ (e.employee_number or '').lower() }}">
+                    data-employee-number="{{ e.employee_number }}">
                     <td class="px-4 py-3 text-sm border-b ">{{ e.employee_number or "" }}</td>
                     <td class="px-4 py-3 text-sm border-b ">{{ e.name }}</td>
                     <td class="px-4 py-3 text-sm border-b ">{{ e.office or "" }}</td>

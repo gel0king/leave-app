@@ -1,2 +1,4 @@
 Flask>=3.0
 pypdf>=5.0
+cryptography
+python-dotenv

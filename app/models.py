@@ -22,11 +22,13 @@ class Employee(db.Model):
     # Leave is stored as 30-minute intervals
     starting_annual_leave = db.Column(
         db.Integer,
+        nullable=False,
         default=0
     )
 
     starting_sick_leave = db.Column(
         db.Integer,
+        nullable=False,
         default=0
     )
 
@@ -62,7 +64,7 @@ class Employee(db.Model):
 
     created_at = db.Column(
         db.DateTime,
-        server_default=db.func.current_timestamp()
+        server_default=db.func.current_timestamp() 
     )
 
     updated_at = db.Column(
@@ -140,3 +142,4 @@ class Log(db.Model):
     end_date = db.Column(db.Date)
 
     hours = db.Column(db.Float)
+
