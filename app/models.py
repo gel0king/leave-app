@@ -44,14 +44,14 @@ class Employee(db.Model):
     return_date = db.Column(db.Date)
 
     driver_license_state = db.Column(db.String(2))
-    license_number = db.Column(db.String(100))
+    license_number = db.Column(db.Text)
     driver_license_expire_date = db.Column(db.Date)
 
     other_id = db.Column(db.String(100))
-    other_id_number = db.Column(db.String(100))
+    other_id_number = db.Column(db.Text)
 
-    ssn = db.Column(db.String(11))
-    date_of_birth = db.Column(db.Date)
+    ssn = db.Column(db.Text)
+    date_of_birth = db.Column(db.Text)
 
     insurance_expires = db.Column(db.Date)
 

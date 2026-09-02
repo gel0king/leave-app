@@ -15,4 +15,7 @@ def new_employee():
 
 @employees_bp.route("/employees/add", methods=["POST"])
 def add_employee_submit():
-    pass
+    # TODO: add logic to add employee to databse. 
+    employees = Employee.query.order_by(Employee.name).all()
+
+    return render_template("employees.html", employees=employees)   
