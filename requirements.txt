@@ -3,3 +3,4 @@ pypdf>=5.0
 cryptography
 python-dotenv
 SQLAlchemy
+reportlab
