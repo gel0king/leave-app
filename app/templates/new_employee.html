@@ -108,19 +108,19 @@
                     />
                 </div>
 
-                <!-- FTE Date -->
+                <!-- Employment Date -->
                 <div class="flex w-[155px] flex-col gap-1">
                     <label
-                        for="FTE_date"
+                        for="employment_date"
                         class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
                     >
                         FTE Date
                     </label>
 
                     <input
-                        id="FTE_date"
+                        id="employment_date"
                         type="date"
-                        name="FTE_date"
+                        name="employment_date"
                         class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
                     />
                 </div>
@@ -551,7 +551,7 @@
 
 <script>
     // Automatically set probation end date to 6 months after start date.
-    document.getElementById("FTE_date").addEventListener("change", function () {
+    document.getElementById("employment_date").addEventListener("change", function () {
         const probationEndInput = document.getElementById("probation_end_date");
         if (!probationEndInput.value) {
             const startDate = new Date(this.value);
