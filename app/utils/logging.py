@@ -78,6 +78,9 @@ def create_log(
     # Check what kind of change was made
     for field in SENSITIVE_FIELDS:
 
+        if field not in raw_old_values and field not in raw_new_values:
+            continue
+
         old_exists = (
             raw_old_values.get(field) not in (None, "")
         )
