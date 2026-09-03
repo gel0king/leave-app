@@ -165,9 +165,7 @@
                             <div
                                 class="mt-2 text-xs bg-gray-50 p-3 rounded max-w-md space-y-3"
                             >
-                                {# ----------------------------- #} {# Employee
-                                field changes #} {#
-                                ----------------------------- #} {% if
+                                {% if
                                 event.old_values or event.new_values %}
                                 <div>
                                     <div
@@ -177,8 +175,7 @@
                                     </div>
 
                                     <div class="space-y-2">
-                                        {# We'll populate this once we see your
-                                        JSON format #} {% if event.old_values %}
+                                        {% if event.old_values %}
                                         <div>
                                             <span class="font-medium"
                                                 >Previous:</span
@@ -195,9 +192,7 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                                {% endif %} {# ----------------------------- #}
-                                {# Leave information #} {#
-                                ----------------------------- #} {% if
+                                {% if
                                 event.leave_type or event.start_date or
                                 event.end_date or event.hours is not none %}
                                 <div
