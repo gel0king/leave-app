@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="rounded-[3px] border border-[#d9d3c4] bg-white px-[22px] py-5 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+    <div>
+        <h2 class="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#6b7275]">
+            Edit Employee
+        </h2>
+
+        <p class="mt-1 text-[12.5px] italic text-[#6b7275]">
+            Update the employee's information below.
+        </p>
+    </div>
+</div>
+
+{% set form_action = url_for('employees.edit_employee', emp_id=employee.id) %}
+{% set submit_text = 'Save Changes' %}
+
+{% include "_employee_form.html" %}
+
+</div>
+
+{% endblock %}

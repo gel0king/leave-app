@@ -242,38 +242,17 @@ def edit_employee(emp_id):
         "return_date": employee.return_date,
 
         "driver_license_state": employee.driver_license_state,
-        "license_number": (
-            decrypt(employee.license_number)
-            if employee.license_number
-            else ""
-        ),
+        "license_number": (decrypt(employee.license_number) if employee.license_number else ""),
         "driver_license_expire_date": employee.driver_license_expire_date,
 
         "other_id": employee.other_id,
-        "other_id_number": (
-            decrypt(employee.other_id_number)
-            if employee.other_id_number
-            else ""
-        ),
+        "other_id_number": (decrypt(employee.other_id_number) if employee.other_id_number else ""),
 
-        "ssn": (
-            decrypt(employee.ssn)
-            if employee.ssn
-            else ""
-        ),
-        "date_of_birth": (
-            decrypt(employee.date_of_birth)
-            if employee.date_of_birth
-            else ""
-        ),
-
+        "ssn": (decrypt(employee.ssn) if employee.ssn else ""),
+        "date_of_birth": (decrypt(employee.date_of_birth) if employee.date_of_birth else ""),
         "insurance_expires": employee.insurance_expires,
 
-        "address": (
-            decrypt(employee.address)
-            if employee.address
-            else ""
-        ),
+        "address": (decrypt(employee.address) if employee.address else ""),
         "city": employee.city,
         "state": employee.state,
         "zip": employee.zip,
@@ -306,10 +285,7 @@ def edit_employee(emp_id):
         return redirect(request.url)
 
     try:
-        start_date = datetime.strptime(
-            start_date_string,
-            "%Y-%m-%d"
-        ).date()
+        start_date = datetime.strptime(start_date_string, "%Y-%m-%d").date()
     except ValueError:
         flash("Invalid start date.", "error")
         return redirect(request.url)
@@ -318,10 +294,7 @@ def edit_employee(emp_id):
         annual_leave = int(float(annual_hours) * 2)
         sick_leave = int(float(sick_hours) * 2)
     except ValueError:
-        flash(
-            "Leave balances must be valid numbers.",
-            "error"
-        )
+        flash("Leave balances must be valid numbers.","error")
         return redirect(request.url)
 
     ssn = request.form.get("ssn", "").strip()
