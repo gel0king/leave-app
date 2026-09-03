@@ -1,0 +1,254 @@
+{% extends "base.html" %} {% block content %}
+
+<div class="bg-white rounded-lg p-6 shadow-sm">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold text-[#1e3f3d] m-0">History</h2>
+        <a href="{{ url_for('history.history', order='ASC' if order == 'DESC' else 'DESC', start_date=start_date, end_date=end_date ) }}"
+            class="px-3 py-2 bg-[#1e3f3d] text-white rounded-md text-sm font-medium hover:bg-[#16302d] transition-colors no-underline">
+            Date {% if order == 'DESC' %}↓{% else %}↑{% endif %}
+        </a>
+    </div>
+    <div class="mb-4">
+        <input type="text" id="search-filter" placeholder="Search by employee name or number..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3f3d]" />
+    </div>
+    <div class="mb-4 flex flex-col sm:flex-row gap-3 items-end">
+        <div class="w-full sm:w-auto">
+            <label for="start-date" class="block text-sm font-medium text-gray-700 mb-1">
+                From
+            </label>
+            <input type="date" id="start-date" name="start_date" value="{{ start_date }}" form="date-filter-form"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3f3d]" />
+        </div>
+        <div class="w-full sm:w-auto">
+            <label for="end-date" class="block text-sm font-medium text-gray-700 mb-1">
+                To
+            </label>
+            <input type="date" id="end-date" name="end_date" value="{{ end_date }}" form="date-filter-form"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3f3d]" />
+        </div>
+        <form id="date-filter-form" method="GET" action="{{ url_for('history.history') }}" class="flex gap-2">
+            <input type="hidden" name="order" value="{{ order }}" />
+
+            <button type="submit"
+                class="px-4 py-2 bg-[#1e3f3d] text-white rounded-md text-sm font-medium hover:bg-[#16302d] transition-colors">
+                Filter
+            </button>
+            {% if start_date or end_date %}
+            <a href="{{ url_for('history.history', order=order) }}"
+                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-300 transition-colors no-underline">
+                Clear
+            </a>
+            {% endif %}
+        </form>
+    </div>
+    {% if events %}
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse" id="history-table">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-gray-200">
+                            Date
+                        </th>
+                        <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-gray-200">
+                            Employee
+                        </th>
+                        <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-gray-200">
+                            Action
+                        </th>
+                        <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-gray-200">
+                            Description
+                        </th>
+                        <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-gray-200">
+                            Notes
+                        </th>
+                        <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-gray-200">
+                            Changes
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr class="hover:bg-gray-50 transition-colors history-row"
+                        data-employee="{{ (event.employee.name or '').lower() }}" 
+                        data-employee-number="{{ event.employee.employee_number or '' }}"
+                        data-action="{{ event.action }}">
+                        <td class="px-4 py-3 text-sm border-b border-gray-200 whitespace-nowrap">
+                            {{ event.time_created.strftime('%m/%d/%Y') }}
+                        </td>
+                        <td class="px-4 py-3 text-sm border-b border-gray-200">
+                            <div>
+                                {{ event.employee.name or 'N/A' }}
+                            </div>
+                            {% if event.employee.employee_number %}
+                            <div class="text-xs text-gray-600">
+                                #{{ event.employee.employee_number }}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-sm border-b border-gray-200">
+                            <span class="inline-block px-2 py-1 rounded text-xs font-medium {% if event.action == 'CREATE' %}bg-green-100 text-green-800 {% elif event.action == 'UPDATE' %}bg-blue-100 text-blue-800 {% elif event.action == 'DELETE' %}bg-red-100 text-red-800 {% elif event.action == 'USED' %}bg-amber-100 text-amber-800 {% else %}bg-gray-100 text-gray-800 {% endif %}">
+                                {{ event.action }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-sm border-b border-gray-200">
+                            {{ event.description or '-' }}
+                        </td>
+                        <td class="px-4 py-3 text-sm border-b border-gray-200">
+                            {{ event.notes or '-' }}
+                        </td>
+                        <td class="px-4 py-3 text-sm border-b border-gray-200 align-top">
+                            {% if event.old_values_display or event.new_values_display or event.leave_type or
+                            event.start_date or event.end_date or event.hours is not none %}
+                            <details class="group">
+                                <summary
+                                    class="inline-flex items-center gap-1.5 cursor-pointer select-none text-[#2f5d5a] hover:text-[#1e3f3d] font-medium text-sm list-none">
+                                    <svg class="w-4 h-4 transition-transform group-open:rotate-90"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                    View changes
+                                </summary>
+                                <div
+                                    class="mt-3 w-full min-w-[420px] max-w-2xl rounded-md bg-white shadow-sm overflow-hidden">
+                                    {% if event.old_values_display or event.new_values_display %}
+
+                                    {% set old_values = event.old_values_display or {} %}
+                                    {% set new_values = event.new_values_display or {} %}
+
+                                    {% set fields = [] %}
+
+                                    {% for key in old_values %}
+                                    {% if key not in fields %}
+                                    {% set _ = fields.append(key) %}
+                                    {% endif %}
+                                    {% endfor %}
+
+                                    {% for key in new_values %}
+                                    {% if key not in fields %}
+                                    {% set _ = fields.append(key) %}
+                                    {% endif %}
+                                    {% endfor %}
+
+
+                                    <div class="px-4 py-3 bg-gray-100 border-b border-gray-200">
+                                        <div class="text-xs font-semibold uppercase tracking-wide text-[#6b7275]">
+                                            Changes
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-[1.4fr_1fr_1fr] bg-gray-50 border-b border-gray-200">
+                                        <div class="px-4 py-2.5 text-xs font-semibold text-gray-600">
+                                            Field
+                                        </div>
+                                        <div
+                                            class="px-4 py-2.5 text-xs font-semibold text-gray-600 border-l border-gray-200">
+                                            Previous
+                                        </div>
+                                        <div
+                                            class="px-4 py-2.5 text-xs font-semibold text-gray-600 border-l border-gray-200">
+                                            New
+                                        </div>
+                                    </div>
+                                    {% for field in fields %}
+
+                                    {% set old_value = old_values.get(field) %}
+                                    {% set new_value = new_values.get(field) %}
+
+                                    {% if old_value != new_value %}
+
+                                    <div class="grid grid-cols-[1.4fr_1fr_1fr] border-b border-gray-100 last:border-b-0">
+                                        <div class="px-4 py-2.5 font-medium text-gray-700 break-words">
+                                            {{ field|replace('_', ' ')|upper }}
+                                        </div>
+                                        <div class="px-4 py-2.5 border-l border-gray-100 break-words">
+                                            {% if old_value is none or old_value == '' %}
+                                            <span class="text-gray-400">-</span>
+                                            {% else %}
+                                            {{ old_value }}
+                                            {% endif %}
+                                        </div>
+                                        <div class="px-4 py-2.5 border-l border-gray-100 break-words">
+                                            {% if new_value is none or new_value == '' %}
+                                            <span class="text-gray-400">-</span>
+                                            {% else %}
+                                            {{ new_value }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% endfor %}
+
+                                </div>
+                                {% endif %}
+
+                                {% if event.leave_type or event.start_date or event.end_date or event.hours is not none %}
+                                <div class="{% if event.old_values_display or event.new_values_display %}border-t border-[#d9d3c4]{% endif %}">
+                                    <div class="px-4 py-3 bg-[#f7f5ef] border-b border-[#d9d3c4]">
+                                        <div class="text-xs font-semibold uppercase tracking-wide text-[#6b7275]">
+                                            Leave Details
+                                        </div>
+                                    </div>
+                                    <div class="px-4 py-3 space-y-2 text-sm">
+                                        {% if event.leave_type %}
+                                        <div class="flex">
+                                            <span class="w-32 font-medium text-gray-600">
+                                                Leave Type
+                                            </span>
+                                            <span class="text-gray-800">
+                                                {{ event.leave_type.name }}
+                                            </span>
+                                        </div>
+                                        {% endif %}
+                                        {% if event.start_date %}
+                                        <div class="flex">
+                                            <span class="w-32 font-medium text-gray-600">
+                                                Start Date
+                                            </span>
+                                            <span class="text-gray-800">
+                                                {{ event.start_date.strftime('%m/%d/%Y') }}
+                                            </span>
+                                        </div>
+                                        {% endif %}
+                                        {% if event.end_date %}
+                                        <div class="flex">
+                                            <span class="w-32 font-medium text-gray-600">
+                                                End Date
+                                            </span>
+
+                                            <span class="text-gray-800">
+                                                {{ event.end_date.strftime('%m/%d/%Y') }}
+                                            </span>
+                                        </div>
+                                        {% endif %}
+                                        {% if event.hours is not none %}
+                                        <div class="flex">
+                                            <span class="w-32 font-medium text-gray-600">
+                                                Hours
+                                            </span>
+                                            <span class="text-gray-800">
+                                                {{ event.hours }}
+                                            </span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                </div>
+                            </details>
+                            {% else %}
+                            <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-gray-500 italic">No activity history yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

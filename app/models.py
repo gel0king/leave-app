@@ -136,7 +136,12 @@ class Log(db.Model):
     new_values = db.Column(db.Text)
     notes = db.Column(db.Text)
 
-    time_created = db.Column(db.DateTime)
+    time_created = db.Column(
+    db.DateTime,
+    server_default=db.func.current_timestamp(),
+    nullable=False,
+    index=True
+    )
 
     start_date = db.Column(db.Date)
     end_date = db.Column(db.Date)
