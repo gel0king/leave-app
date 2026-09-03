@@ -4,6 +4,7 @@ from flask import Blueprint, render_template, request
 from sqlalchemy.orm import joinedload
 
 from app.models import Log
+from app.utils.logging import parse_log_values
 
 history_bp = Blueprint("history", __name__)
 
@@ -71,6 +72,11 @@ def history():
         query = query.order_by(Log.time_created.desc())
 
     events = query.all()
+
+    # Parse changes for jinja
+    for event in events:
+        event.old_values_display = parse_log_values(event.old_values)
+        event.new_values_display = parse_log_values(event.new_values)
 
     return render_template(
         "history.html",

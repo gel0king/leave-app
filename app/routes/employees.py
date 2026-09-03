@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.extensions import db
 from app.models import Employee
 from app.utils.encryption import encrypt, decrypt
+from app.utils.logging import create_log
 
 from datetime import datetime
 
@@ -154,23 +155,69 @@ def add_employee_submit():
     )
 
     db.session.add(employee)
+    create_log(
+        employee=employee,
+        action="CREATE",
+        description="Employee created",
+        new_values={
+            "employee_number": employee.employee_number,
+            "name": employee.name,
+            "office": employee.office,
+
+            "starting_annual_leave": employee.starting_annual_leave,
+            "starting_sick_leave": employee.starting_sick_leave,
+
+            "start_date": employee.start_date,
+            "employment_status": employee.employment_status,
+            "employment_date": employee.employment_date,
+            "employment_history": employee.employment_history,
+            "probation_end_date": employee.probation_end_date,
+
+            "departure_date": employee.departure_date,
+            "return_date": employee.return_date,
+
+            "driver_license_state": employee.driver_license_state,
+            "license_number": employee.license_number,
+            "driver_license_expire_date": employee.driver_license_expire_date,
+
+            "other_id": employee.other_id,
+            "other_id_number": employee.other_id_number,
+
+            "ssn": employee.ssn,
+            "date_of_birth": employee.date_of_birth,
+
+            "insurance_expires": employee.insurance_expires,
+
+            "address": employee.address,
+            "city": employee.city,
+            "state": employee.state,
+            "zip": employee.zip,
+        },
+    )
+
     db.session.commit()
 
     flash("Employee added.", "success")
 
     return redirect(
         url_for("employees.employees")
-    ) 
+    )
+
 
 # TODO: Implement Edit Page
 @employees_bp.route("/employees/<int:emp_id>/edit")
 def edit_employee(emp_id):
     return render_template("employees.html")
 
-# TODO: Emplement soft delete for employees.(Mark as inactive)
-@employees_bp.route("/employees/<int:emp_id>/remove", methods=["POST"])
+
+# TODO: Implement soft delete for employees.
+@employees_bp.route(
+    "/employees/<int:emp_id>/remove",
+    methods=["POST"]
+)
 def remove_employee(emp_id):
     return render_template("employees.html")
+
 
 def parse_date(value):
     if not value:

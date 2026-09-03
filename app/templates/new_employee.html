@@ -1,11 +1,8 @@
 {% extends "base.html" %} {% block content %}
 
-<div
-    class="rounded-[3px] border border-[#d9d3c4] bg-white px-[22px] py-5 shadow-sm"
->
+<div class="rounded-[3px] border border-[#d9d3c4] bg-white px-[22px] py-5 shadow-sm">
     <h2
-        class="mb-4 border-b border-[#d9d3c4] pb-2.5 text-[13px] font-semibold uppercase tracking-[0.06em] text-[#6b7275]"
-    >
+        class="mb-4 border-b border-[#d9d3c4] pb-2.5 text-[13px] font-semibold uppercase tracking-[0.06em] text-[#6b7275]">
         Add New Employee
     </h2>
     <p class="-mt-1 mb-5 text-[12.5px] italic text-[#6b7275]">
@@ -16,67 +13,40 @@
         <!-- Employee Information -->
         <fieldset class="mb-6">
             <legend
-                class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]"
-            >
+                class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]">
                 Employee Information
             </legend>
 
             <div class="flex flex-wrap items-end gap-3">
                 <!-- Employee Number -->
                 <div class="flex w-[150px] flex-col gap-1">
-                    <label
-                        for="employee_number"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="employee_number" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Employee #
                     </label>
 
-                    <input
-                        id="employee_number"
-                        type="number"
-                        name="employee_number"
-                        placeholder="e.g. 4378"
-                        required
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="employee_number" type="number" name="employee_number" placeholder="e.g. 4378" required
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- Name -->
                 <div class="flex min-w-[250px] flex-1 flex-col gap-1">
-                    <label
-                        for="name"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="name" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Name
                     </label>
 
-                    <input
-                        id="name"
-                        type="text"
-                        name="name"
-                        placeholder="Employee name"
-                        required
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="name" type="text" name="name" placeholder="Employee name" required
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- Office -->
                 <!-- May switch to dropdown for uniformity -->
                 <div class="flex min-w-[200px] flex-1 flex-col gap-1">
-                    <label
-                        for="office"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="office" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Office
                     </label>
 
-                    <input
-                        id="office"
-                        type="text"
-                        name="office"
-                        placeholder="Office"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="office" type="text" name="office" placeholder="Office"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
             </div>
         </fieldset>
@@ -84,78 +54,49 @@
         <!-- Employment Information -->
         <fieldset class="mb-6">
             <legend
-                class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]"
-            >
+                class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]">
                 Employment Information
             </legend>
 
             <div class="flex flex-wrap items-end gap-3">
                 <!-- Start Date -->
                 <div class="flex w-[155px] flex-col gap-1">
-                    <label
-                        for="start_date"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="start_date" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Start Date
                     </label>
 
-                    <input
-                        id="start_date"
-                        type="date"
-                        name="start_date"
-                        required
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="start_date" type="date" name="start_date" required
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- Employment Date -->
                 <div class="flex w-[155px] flex-col gap-1">
-                    <label
-                        for="employment_date"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="employment_date" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         FTE Date
                     </label>
 
-                    <input
-                        id="employment_date"
-                        type="date"
-                        name="employment_date"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="employment_date" type="date" name="employment_date"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- Probation End -->
                 <div class="flex w-[175px] flex-col gap-1">
-                    <label
-                        for="probation_end_date"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="probation_end_date" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Probation End Date
                     </label>
 
-                    <input
-                        id="probation_end_date"
-                        type="date"
-                        name="probation_end_date"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="probation_end_date" type="date" name="probation_end_date"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- Employment Status -->
                 <div class="flex min-w-[180px] flex-1 flex-col gap-1">
-                    <label
-                        for="employment_status"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="employment_status" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Employment Status
                     </label>
 
-                    <select
-                        id="employment_status"
-                        name="employment_status"
-                        class="rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    >
+                    <select id="employment_status" name="employment_status"
+                        class="rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1">
                         <option value="Seasonal">Seasonal</option>
                         <option value="Full Time">Full Time</option>
                         <option value="Inactive">Inactive</option>
@@ -165,18 +106,12 @@
 
             <!-- Employment History -->
             <div class="mt-3 flex flex-col gap-1">
-                <label
-                    for="employment_history"
-                    class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                >
+                <label for="employment_history" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                     Employment History
                 </label>
 
-                <select
-                    id="employment_history"
-                    name="employment_history"
-                    class="rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                >
+                <select id="employment_history" name="employment_history"
+                    class="rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1">
                     <option value="Full Time">New Hire</option>
                     <option value="Seasonal">Retiree</option>
                     <option value="Inactive">Returning</option>
@@ -187,52 +122,29 @@
         <!-- Leave Balances -->
         <fieldset class="mb-6">
             <legend
-                class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]"
-            >
+                class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]">
                 Initial Leave Balances
             </legend>
 
             <div class="flex flex-wrap items-end gap-3">
                 <!-- Annual Leave -->
                 <div class="flex w-[170px] flex-col gap-1">
-                    <label
-                        for="annual_balance"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="annual_balance" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Annual Leave (hours)
                     </label>
 
-                    <input
-                        id="annual_balance"
-                        type="number"
-                        step="0.5"
-                        min="0"
-                        name="annual_balance"
-                        value="0"
-                        required
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="annual_balance" type="number" step="0.5" min="0" name="annual_balance" value="0" required
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- Sick Leave -->
                 <div class="flex w-[170px] flex-col gap-1">
-                    <label
-                        for="sick_balance"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="sick_balance" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Sick Leave (hours)
                     </label>
 
-                    <input
-                        id="sick_balance"
-                        type="number"
-                        step="0.5"
-                        min="0"
-                        name="sick_balance"
-                        value="0"
-                        required
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="sick_balance" type="number" step="0.5" min="0" name="sick_balance" value="0" required
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
             </div>
         </fieldset>
@@ -240,98 +152,61 @@
         <!-- Identification -->
         <fieldset class="mb-6">
             <legend
-                class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]"
-            >
+                class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]">
                 Identification
             </legend>
 
             <div class="flex flex-wrap items-end gap-3">
                 <!-- Driver License State -->
                 <div class="flex w-[100px] flex-col gap-1">
-                    <label
-                        for="driver_license_state"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="driver_license_state" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         DL State
                     </label>
 
-                    <input
-                        id="driver_license_state"
-                        type="text"
-                        name="driver_license_state"
-                        maxlength="2"
+                    <input id="driver_license_state" type="text" name="driver_license_state" maxlength="2"
                         placeholder="TX"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] uppercase text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] uppercase text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- License Number -->
                 <div class="flex min-w-[180px] flex-1 flex-col gap-1">
-                    <label
-                        for="license_number"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="license_number" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         License Number
                     </label>
 
-                    <input
-                        id="license_number"
-                        type="text"
-                        name="license_number"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="license_number" type="text" name="license_number"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- License Expiration -->
                 <div class="flex w-[170px] flex-col gap-1">
-                    <label
-                        for="driver_license_expire_date"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="driver_license_expire_date"
+                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         DL Expiration
                     </label>
 
-                    <input
-                        id="driver_license_expire_date"
-                        type="date"
-                        name="driver_license_expire_date"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="driver_license_expire_date" type="date" name="driver_license_expire_date"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- Other ID -->
                 <div class="flex min-w-[160px] flex-1 flex-col gap-1">
-                    <label
-                        for="other_id"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="other_id" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Other ID
                     </label>
 
-                    <input
-                        id="other_id"
-                        type="text"
-                        name="other_id"
-                        placeholder="ID type"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="other_id" type="text" name="other_id" placeholder="ID type"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- Other ID Number -->
                 <div class="flex min-w-[160px] flex-1 flex-col gap-1">
-                    <label
-                        for="other_id_number"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="other_id_number" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Other ID Number
                     </label>
 
-                    <input
-                        id="other_id_number"
-                        type="text"
-                        name="other_id_number"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="other_id_number" type="text" name="other_id_number"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
             </div>
         </fieldset>
@@ -339,64 +214,39 @@
         <!-- Personal Information -->
         <fieldset class="mb-6">
             <legend
-                class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]"
-            >
+                class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]">
                 Personal Information
             </legend>
 
             <div class="flex flex-wrap items-end gap-3">
                 <!-- SSN -->
                 <div class="flex w-[170px] flex-col gap-1">
-                    <label
-                        for="ssn"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="ssn" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         SSN
                     </label>
 
-                    <input
-                        id="ssn"
-                        type="text"
-                        name="ssn"
-                        maxlength="11"
-                        placeholder="###-##-####"
-                        autocomplete="off"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="ssn" type="text" name="ssn" maxlength="11" placeholder="###-##-####" autocomplete="off"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- Date of Birth -->
                 <div class="flex w-[155px] flex-col gap-1">
-                    <label
-                        for="date_of_birth"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="date_of_birth" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Date of Birth
                     </label>
 
-                    <input
-                        id="date_of_birth"
-                        type="date"
-                        name="date_of_birth"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="date_of_birth" type="date" name="date_of_birth"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- Insurance Expiration -->
                 <div class="flex w-[175px] flex-col gap-1">
-                    <label
-                        for="insurance_expires"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="insurance_expires" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Insurance Expires
                     </label>
 
-                    <input
-                        id="insurance_expires"
-                        type="date"
-                        name="insurance_expires"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="insurance_expires" type="date" name="insurance_expires"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
             </div>
         </fieldset>
@@ -404,83 +254,49 @@
         <!-- Address -->
         <fieldset class="mb-6">
             <legend
-                class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]"
-            >
+                class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]">
                 Address
             </legend>
 
             <div class="flex flex-wrap items-end gap-3">
                 <!-- Address -->
                 <div class="flex min-w-[280px] flex-[2] flex-col gap-1">
-                    <label
-                        for="address"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="address" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Address
                     </label>
 
-                    <input
-                        id="address"
-                        type="text"
-                        name="address"
-                        placeholder="Street address"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="address" type="text" name="address" placeholder="Street address"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- City -->
                 <div class="flex min-w-[180px] flex-1 flex-col gap-1">
-                    <label
-                        for="city"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="city" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         City
                     </label>
 
-                    <input
-                        id="city"
-                        type="text"
-                        name="city"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="city" type="text" name="city"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- State -->
                 <div class="flex w-[90px] flex-col gap-1">
-                    <label
-                        for="state"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="state" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         State
                     </label>
 
-                    <input
-                        id="state"
-                        type="text"
-                        name="state"
-                        maxlength="2"
-                        placeholder="TX"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] uppercase text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="state" type="text" name="state" maxlength="2" placeholder="TX"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] uppercase text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- ZIP -->
                 <div class="flex w-[110px] flex-col gap-1">
-                    <label
-                        for="zip"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="zip" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         ZIP
                     </label>
 
-                    <input
-                        id="zip"
-                        type="text"
-                        name="zip"
-                        maxlength="10"
-                        placeholder="ZIP"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="zip" type="text" name="zip" maxlength="10" placeholder="ZIP"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
             </div>
         </fieldset>
@@ -488,61 +304,42 @@
         <!-- Departure / Return -->
         <fieldset class="mb-6">
             <legend
-                class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]"
-            >
+                class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]">
                 Departure / Return
             </legend>
 
             <div class="flex flex-wrap items-end gap-3">
                 <!-- Departure Date -->
                 <div class="flex w-[170px] flex-col gap-1">
-                    <label
-                        for="departure_date"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="departure_date" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Departure Date
                     </label>
 
-                    <input
-                        id="departure_date"
-                        type="date"
-                        name="departure_date"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="departure_date" type="date" name="departure_date"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
 
                 <!-- Return Date -->
                 <div class="flex w-[170px] flex-col gap-1">
-                    <label
-                        for="return_date"
-                        class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]"
-                    >
+                    <label for="return_date" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                         Return Date
                     </label>
 
-                    <input
-                        id="return_date"
-                        type="date"
-                        name="return_date"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-                    />
+                    <input id="return_date" type="date" name="return_date"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
                 </div>
             </div>
         </fieldset>
 
         <!-- Actions -->
         <div class="flex items-center gap-3 border-t border-[#d9d3c4] pt-5">
-            <button
-                type="submit"
-                class="rounded-[3px] border-0 bg-[#2f5d5a] px-[18px] py-[9px] text-[13px] font-semibold tracking-[0.02em] text-white transition-colors hover:bg-[#1e3f3d] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"
-            >
+            <button type="submit"
+                class="rounded-[3px] border-0 bg-[#2f5d5a] px-[18px] py-[9px] text-[13px] font-semibold tracking-[0.02em] text-white transition-colors hover:bg-[#1e3f3d] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1">
                 Add Employee
             </button>
 
-            <a
-                href="{{ url_for('employees.employees') }}"
-                class="rounded-[3px] bg-[#e5e1d7] px-[18px] py-[9px] text-[13px] font-semibold tracking-[0.02em] text-[#1f2a2e] no-underline transition-colors hover:bg-[#d9d3c4] focus:outline-none focus:ring-2 focus:ring-[#d9d3c4] focus:ring-offset-1"
-            >
+            <a href="{{ url_for('employees.employees') }}"
+                class="rounded-[3px] bg-[#e5e1d7] px-[18px] py-[9px] text-[13px] font-semibold tracking-[0.02em] text-[#1f2a2e] no-underline transition-colors hover:bg-[#d9d3c4] focus:outline-none focus:ring-2 focus:ring-[#d9d3c4] focus:ring-offset-1">
                 Cancel
             </a>
         </div>
@@ -551,26 +348,29 @@
 
 <script>
     // Automatically set probation end date to 6 months after start date.
-    document.getElementById("employment_date").addEventListener("change", function () {
-        const probationEndInput = document.getElementById("probation_end_date");
-        if (!probationEndInput.value) {
-            const startDate = new Date(this.value);
+    document
+        .getElementById("employment_date")
+        .addEventListener("change", function () {
+            const probationEndInput =
+                document.getElementById("probation_end_date");
+            if (!probationEndInput.value) {
+                const startDate = new Date(this.value);
 
-            if (!isNaN(startDate.getTime())) {
-                const probationEnd = new Date(startDate);
-                probationEnd.setMonth(probationEnd.getMonth() + 6);
+                if (!isNaN(startDate.getTime())) {
+                    const probationEnd = new Date(startDate);
+                    probationEnd.setMonth(probationEnd.getMonth() + 6);
 
-                const year = probationEnd.getFullYear();
-                const month = String(probationEnd.getMonth() + 1).padStart(
-                    2,
-                    "0",
-                );
-                const day = String(probationEnd.getDate()).padStart(2, "0");
+                    const year = probationEnd.getFullYear();
+                    const month = String(probationEnd.getMonth() + 1).padStart(
+                        2,
+                        "0",
+                    );
+                    const day = String(probationEnd.getDate()).padStart(2, "0");
 
-                probationEndInput.value = `${year}-${month}-${day}`;
+                    probationEndInput.value = `${year}-${month}-${day}`;
+                }
             }
-        }
-    });
+        });
 
     // Format SSN as ###-##-####
     document.getElementById("ssn").addEventListener("input", function () {
