@@ -4,7 +4,7 @@ from app.extensions import db
 from app.models import Employee
 from app.utils.encryption import encrypt, decrypt
 from app.utils.logging import create_log
-from app.utils.helper import parse_leave_hours
+from app.utils.helper import parse_leave_hours, parse_date
 
 from datetime import datetime
 
@@ -442,15 +442,3 @@ def permanently_delete_employee(emp_id):
     # No log created due to relationship cascade erasing all logs
 
     return redirect(url_for("employees.inactive_employees"))
-
-def parse_date(value):
-    if not value:
-        return None
-
-    try:
-        return datetime.strptime(
-            value,
-            "%Y-%m-%d"
-        ).date()
-    except ValueError:
-        return None
