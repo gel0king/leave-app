@@ -1,7 +1,9 @@
 import json
+from decimal import Decimal
 
 from app.extensions import db
 from app.models import Log
+
 
 
 # Dont send raw values to create log
@@ -20,6 +22,9 @@ def serialize_value(value):
 
     if hasattr(value, "isoformat"):
         return value.isoformat()
+
+    if isinstance(value, Decimal):
+        return float(value)
 
     return value
 
@@ -77,6 +82,9 @@ def create_log(
 
     # Check what kind of change was made
     for field in SENSITIVE_FIELDS:
+
+        if field not in raw_old_values and field not in raw_new_values:
+            continue
 
         old_exists = (
             raw_old_values.get(field) not in (None, "")
