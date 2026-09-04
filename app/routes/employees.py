@@ -4,6 +4,7 @@ from app.extensions import db
 from app.models import Employee
 from app.utils.encryption import encrypt, decrypt
 from app.utils.logging import create_log
+from app.utils.helper import parse_leave_hours
 
 from datetime import datetime
 
@@ -64,12 +65,11 @@ def add_employee_submit():
         flash("Invalid start date.", "error")
         return redirect(request.url)
 
-    # Convert leave hours to 30-minute intervals
-    try:
-        annual_leave = int(float(annual_hours) * 2)
-        sick_leave = int(float(sick_hours) * 2)
-    except ValueError:
-        flash("Leave balances must be valid numbers.", "error")
+    annual_leave = parse_leave_hours(annual_hours)
+    sick_leave = parse_leave_hours(sick_hours)
+
+    if annual_leave is None or sick_leave is None:
+        flash("Leave balances must be in 0.5 hour increments.", "error")
         return redirect(request.url)
 
     # Encrypt sensitive fields
@@ -290,11 +290,11 @@ def edit_employee(emp_id):
         flash("Invalid start date.", "error")
         return redirect(request.url)
 
-    try:
-        annual_leave = int(float(annual_hours) * 2)
-        sick_leave = int(float(sick_hours) * 2)
-    except ValueError:
-        flash("Leave balances must be valid numbers.","error")
+    annual_leave = parse_leave_hours(annual_hours)
+    sick_leave = parse_leave_hours(sick_hours)
+
+    if annual_leave is None or sick_leave is None:
+        flash("Leave balances must be in 0.5 hour increments.", "error")
         return redirect(request.url)
 
     ssn = request.form.get("ssn", "").strip()

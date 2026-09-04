@@ -1,4 +1,5 @@
 from .extensions import db
+from sqlalchemy import Numeric
 
 
 class Employee(db.Model):
@@ -19,15 +20,14 @@ class Employee(db.Model):
 
     office = db.Column(db.String(255))
 
-    # Leave is stored as 30-minute intervals
     starting_annual_leave = db.Column(
-        db.Integer,
+        db.Numeric(6, 1),
         nullable=False,
         default=0
     )
 
     starting_sick_leave = db.Column(
-        db.Integer,
+        db.Numeric(6, 1),
         nullable=False,
         default=0
     )
@@ -146,5 +146,5 @@ class Log(db.Model):
     start_date = db.Column(db.Date)
     end_date = db.Column(db.Date)
 
-    hours = db.Column(db.Float)
+    hours = db.Column(db.Numeric(6, 1))
 

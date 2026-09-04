@@ -1,4 +1,4 @@
-<form method="post" action="{{ url_for('employees.form_action') }}">
+<form method="post" action="{{ form_action }}">
     <!-- Employee Information -->
     <fieldset class="mb-6">
         <legend
@@ -130,7 +130,7 @@
                     Annual Leave (hours)
                 </label>
 
-                <input id="annual_balance" type="number" step="0.5" min="0" value="{{ employee.starting_annual_leave or '' }}" name="annual_balance" value="0" required
+                <input id="annual_balance" type="number" step="0.5" min="0" value="{{ employee.starting_annual_leave or '0' }}" name="annual_balance" required
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
 
@@ -140,7 +140,7 @@
                     Sick Leave (hours)
                 </label>
 
-                <input id="sick_balance" type="number" step="0.5" min="0" value="{{ employee.starting_sick_leave or '' }}" name="sick_balance" value="0" required
+                <input id="sick_balance" type="number" step="0.5" min="0" value="{{ employee.starting_sick_leave or '0' }}" name="sick_balance" required
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
         </div>

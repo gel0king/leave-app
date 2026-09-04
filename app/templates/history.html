@@ -250,5 +250,41 @@
         <p class="text-gray-500 italic">No activity history yet.</p>
     {% endif %}
 </div>
+<script>
+  // Fuzzy search
+  function fuzzyMatch(searchStr, targetStr) {
+    const search = searchStr.toLowerCase();
+    const target = targetStr.toLowerCase();
+    
+    if (search === '') return true;
+    if (target.includes(search)) return true;
+    
+    let searchIndex = 0;
+    for (let i = 0; i < target.length && searchIndex < search.length; i++) {
+      if (target[i] === search[searchIndex]) {
+        searchIndex++;
+      }
+    }
+    return searchIndex === search.length;
+  }
+
+  function updateFilter() {
+    const searchInput = document.getElementById('search-filter');
+    const searchValue = searchInput.value.trim();
+    const rows = document.querySelectorAll('.history-row');
+    
+    rows.forEach(row => {
+      const employeeName = row.getAttribute('data-employee');
+      const employeeNumber = row.getAttribute('data-employee-number');
+      if (fuzzyMatch(searchValue, employeeName) || fuzzyMatch(searchValue, employeeNumber)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+  
+  document.getElementById('search-filter').addEventListener('input', updateFilter);
+</script>
 
 {% endblock %}
