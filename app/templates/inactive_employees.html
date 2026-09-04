@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="rounded-[3px] border border-[#d9d3c4] bg-white px-[22px] py-5 shadow-sm">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold text-[#1e3f3d] m-0">Inactive Employees</h2>
+        <a href="{{ url_for('employees.employees') }}"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors no-underline">
+            Back to Employees
+        </a>
+    </div>
+    <div class="mb-4">
+        <input type="text" id="search-filter" placeholder="Search by employee name or employee number..."
+            class="w-full  px-3 py-2 border border-[#d9d3c4] rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#2f5d5a]">
+    </div>
+    {% if employees %}
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-white">
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Employee
+                        #</th>
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Name</th>
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Dept</th>
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Status
+                    </th>
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in employees %}
+                <tr class="hover:bg-gray-50 transition-colors permanent-delete-row" data-employee="{{ e.name.lower() }}"
+                    data-employee-number="{{ e.employee_number }}">
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ e.employee_number or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ e.name }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ e.office or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ e.employment_status or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">
+                        <div class="flex gap-3 items-center">
+                            <a href="{{ url_for('employees.edit_employee', emp_id=e.id, restore=1) }}"
+                                title="Restore employee"
+                                class="px-3 py-2 rounded-md bg-green-50 text-green-700 hover:bg-green-100 transition-colors no-underline text-xs font-medium">
+                                Restore
+                            </a>
+                            <form method="post"
+                                action="{{ url_for('employees.permanently_delete_employee', emp_id=e.id) }}"
+                                class="permanent-delete-form" data-employee-name="{{ e.name }}">
+                                <button type="button"
+                                    class="delete-button inline-flex items-center justify-center w-8 h-8 rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors border-none cursor-pointer"
+                                    title="Permanently delete employee" aria-label="Permanently delete {{ e.name }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path
+                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                        </path>
+                                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-500 italic">
+        No inactive employees.
+    </p>
+    {% endif %}
+</div>
+<div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+    <div id="delete-modal-backdrop" class="absolute inset-0 bg-black/40"></div>
+    <div class="relative z-10 w-full max-w-md mx-4 rounded-lg bg-white shadow-xl border border-[#d9d3c4]">
+        <div class="px-6 py-5">
+            <h3 class="text-lg font-semibold text-[#1e3f3d] m-0">Delete Employee</h3>
+        </div>
+        <div class="px-6 py-5">
+            <p class="text-sm text-gray-700">
+                Are you sure you want to permanently delete
+                <span id="delete-employee-name" class="font-semibold text-[#1e3f3d]"></span>?
+            </p>
+
+            <p class="text-xs text-red-600 mt-3">
+                This action cannot be undone. The employee and their records will be permanently deleted.
+            </p>
+        </div>
+        <div class="px-6 py-4 bg-gray-50 rounded-b-lg">
+            <div class="flex justify-end gap-3">
+                <button type="button" id="delete-cancel"
+                    class="px-4 py-2 rounded-md bg-white border border-[#d9d3c4] text-gray-700 text-sm font-medium hover:bg-gray-100">
+                    Cancel
+                </button>
+                <button type="button" id="delete-confirm"
+                    class="px-4 py-2 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-700">
+                    Permanently Delete Employee
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Delete employee
+    const deleteModal = document.getElementById('delete-modal');
+    const deleteModalBackdrop = document.getElementById('delete-modal-backdrop');
+    const deleteCancel = document.getElementById('delete-cancel');
+    const deleteConfirm = document.getElementById('delete-confirm');
+    const deleteEmployeeName = document.getElementById('delete-employee-name');
+
+    let selectedDeleteForm = null;
+
+    function openDeleteModal(form) {
+        selectedDeleteForm = form;
+
+        deleteEmployeeName.textContent =
+            form.getAttribute('data-employee-name');
+
+        deleteModal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+
+        deleteConfirm.focus();
+    }
+
+    function closeDeleteModal() {
+        deleteModal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+
+        selectedDeleteForm = null;
+    }
+
+    document.querySelectorAll('.delete-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const form = this.closest('.permanent-delete-form');
+            openDeleteModal(form);
+        });
+    });
+
+    deleteCancel.addEventListener('click', closeDeleteModal);
+    deleteModalBackdrop.addEventListener('click', closeDeleteModal);
+
+    deleteConfirm.addEventListener('click', function () {
+        if (selectedDeleteForm) {
+            selectedDeleteForm.submit();
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (
+            event.key === 'Escape' &&
+            !deleteModal.classList.contains('hidden')
+        ) {
+            closeDeleteModal();
+        }
+    });
+
+    // Fuzzy search
+    function fuzzyMatch(searchStr, targetStr) {
+        const search = searchStr.toLowerCase();
+        const target = targetStr.toLowerCase();
+
+        if (search === '') return true;
+        if (target.includes(search)) return true;
+
+        let searchIndex = 0;
+        for (let i = 0; i < target.length && searchIndex < search.length; i++) {
+            if (target[i] === search[searchIndex]) {
+                searchIndex++;
+            }
+        }
+        return searchIndex === search.length;
+    }
+
+    function updateFilter() {
+        const searchInput = document.getElementById('search-filter');
+        const searchValue = searchInput.value.trim();
+        const rows = document.querySelectorAll('.permanent-delete-row');
+
+        rows.forEach(row => {
+            const employeeName = row.getAttribute('data-employee');
+            const employeeNumber = row.getAttribute('data-employee-number');
+            if (fuzzyMatch(searchValue, employeeName) || fuzzyMatch(searchValue, employeeNumber)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    document.getElementById('search-filter').addEventListener('input', updateFilter);
+</script>
+
+{% endblock %}

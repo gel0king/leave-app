@@ -74,7 +74,8 @@ class Employee(db.Model):
 
     logs = db.relationship(
         "Log",
-        back_populates="employee"
+        back_populates="employee",
+        cascade="all, delete-orphan"
     )
 
 class LeaveType(db.Model):
