@@ -20,30 +20,20 @@ class Employee(db.Model):
 
     office = db.Column(db.String(255))
 
-    starting_annual_leave = db.Column(
-        db.Numeric(6, 1),
-        nullable=False,
-        default=0
-    )
-
-    starting_sick_leave = db.Column(
-        db.Numeric(6, 1),
-        nullable=False,
-        default=0
-    )
-
     start_date = db.Column(
         db.Date,
         nullable=False
     )
+    
 
+    # TODO: Remove after switching to new employment period table
     employment_status = db.Column(db.String(100))
     employment_date = db.Column(db.Date)
     employment_history = db.Column(db.Text)
     probation_end_date = db.Column(db.Date)
-
     departure_date = db.Column(db.Date)
     return_date = db.Column(db.Date)
+
 
     driver_license_state = db.Column(db.String(2))
     license_number = db.Column(db.Text)
@@ -76,6 +66,13 @@ class Employee(db.Model):
         "Log",
         back_populates="employee",
         cascade="all, delete-orphan"
+    )
+
+    employment_periods = db.relationship(
+        "EmploymentPeriod",
+        back_populates="employee",
+        cascade="all, delete-orphan",
+        order_by="EmploymentPeriod.start_date"
     )
 
 class LeaveType(db.Model):
@@ -149,3 +146,74 @@ class Log(db.Model):
 
     hours = db.Column(db.Numeric(6, 1))
 
+class EmploymentPeriod(db.Model):
+    __tablename__ = "employment_periods"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    employee_id = db.Column(
+        db.Integer,
+        db.ForeignKey("employees.id"),
+        nullable=False
+    )
+
+    start_date = db.Column(
+        db.Date,
+        nullable=False
+    )
+
+    employment_date = db.Column(
+        db.Date,
+        nullable=True
+    )
+
+    employment_status = db.Column(
+        db.String(100),
+        nullable=False,
+        default="Seasonal"
+    )
+
+    employment_history = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    probation_end_date = db.Column(
+        db.Date,
+        nullable=True
+    )
+
+    starting_annual_leave = db.Column(
+        db.Numeric(6, 1),
+        nullable=False,
+        default=0
+    )
+
+    starting_sick_leave = db.Column(
+        db.Numeric(6, 1),
+        nullable=False,
+        default=0
+    )
+
+    end_date = db.Column(
+        db.Date,
+        nullable=True
+    )
+
+    departure_date = db.Column(
+        db.Date,
+        nullable=True
+    )
+
+    return_date = db.Column(
+        db.Date,
+        nullable=True
+    )
+
+    employee = db.relationship(
+        "Employee",
+        back_populates="employment_periods"
+    )

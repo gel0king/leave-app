@@ -13,7 +13,8 @@
                     Employee #
                 </label>
 
-                <input id="employee_number" type="number" name="employee_number" value="{{ employee.employee_number or '' }}" placeholder="e.g. 4378" required
+                <input id="employee_number" type="number" name="employee_number"
+                    value="{{ employee.employee_number or '' }}" placeholder="e.g. 4378" required
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
 
@@ -23,7 +24,8 @@
                     Name
                 </label>
 
-                <input id="name" type="text" name="name" value="{{ employee.name or '' }}" placeholder="Employee name" required
+                <input id="name" type="text" name="name" value="{{ employee.name or '' }}" placeholder="Employee name"
+                    required
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
 
@@ -53,8 +55,8 @@
                 <label for="start_date" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
                     Start Date
                 </label>
-
-                <input id="start_date" type="date" name="start_date" value="{{ employee.start_date or '' }}" required
+                <input id="start_date" type="date" name="start_date" value="{{ employee.start_date or '' }}"
+                    required
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
 
@@ -64,7 +66,8 @@
                     FTE Date
                 </label>
 
-                <input id="employment_date" type="date" value="{{ employee.employment_date or '' }}" name="employment_date"
+                <input id="employment_date" type="date" value="{{ employment_period.employment_date or '' }}"
+                    name="employment_date"
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
 
@@ -74,7 +77,8 @@
                     Probation End Date
                 </label>
 
-                <input id="probation_end_date" type="date" value="{{ employee.probation_end_date or '' }}" name="probation_end_date"
+                <input id="probation_end_date" type="date" value="{{ employment_period.probation_end_date or '' }}"
+                    name="probation_end_date"
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
 
@@ -85,16 +89,16 @@
                 </label>
                 <select id="employment_status" name="employment_status"
                     class="rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1">
-                    <option value="Seasonal"
-                        {% if employee.employment_status == "Seasonal" %}selected{% endif %}>
+                    <option value="Seasonal" {% if employment_period.employment_status=="Seasonal" %}selected{% endif
+                        %}>
                         Seasonal
                     </option>
-                    <option value="Full Time"
-                        {% if employee.employment_status == "Full Time" %}selected{% endif %}>
+                    <option value="Full Time" {% if employment_period.employment_status=="Full Time" %}selected{% endif
+                        %}>
                         Full Time
                     </option>
-                    <option value="Inactive"
-                        {% if employee.employment_status == "Inactive" %}selected{% endif %}>
+                    <option value="Inactive" {% if employment_period.employment_status=="Inactive" %}selected{% endif
+                        %}>
                         Inactive
                     </option>
                 </select>
@@ -109,9 +113,18 @@
 
             <select id="employment_history" name="employment_history"
                 class="rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1">
-                <option value="New Hire">New Hire</option>
-                <option value="Retiree">Retiree</option>
-                <option value="Returning">Returning</option>
+                <option value="New Hire" 
+                    {% if employment_period and employment_period.employment_history=="New Hire"%}selected{% endif %}>
+                    New Hire
+                </option>
+                <option value="Retiree" 
+                    {% if employment_period and employment_period.employment_history=="Retiree"%}selected{% endif %}>
+                    Retiree
+                </option>
+                <option value="Returning" 
+                    {% if employment_period and employment_period.employment_history=="Returning"%}selected{% endif %}>
+                    Returning
+                </option>
             </select>
         </div>
     </fieldset>
@@ -130,7 +143,8 @@
                     Annual Leave (hours)
                 </label>
 
-                <input id="annual_balance" type="number" step="0.5" min="0" value="{{ employee.starting_annual_leave or '0' }}" name="annual_balance" required
+                <input id="annual_balance" type="number" step="0.5" min="0"
+                    value="{{ employment_period.starting_annual_leave if employment_period else '0' }}" name="annual_balance" required
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
 
@@ -140,7 +154,8 @@
                     Sick Leave (hours)
                 </label>
 
-                <input id="sick_balance" type="number" step="0.5" min="0" value="{{ employee.starting_sick_leave or '0' }}" name="sick_balance" required
+                <input id="sick_balance" type="number" step="0.5" min="0"
+                    value="{{ employment_period.starting_sick_leave if employment_period else '0' }}" name="sick_balance" required
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
         </div>
@@ -160,7 +175,8 @@
                     DL State
                 </label>
 
-                <input id="driver_license_state" type="text" value="{{ employee.driver_license_state or '' }}" name="driver_license_state" maxlength="2" placeholder="TX"
+                <input id="driver_license_state" type="text" value="{{ employee.driver_license_state or '' }}"
+                    name="driver_license_state" maxlength="2" placeholder="TX"
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] uppercase text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
 
@@ -180,7 +196,8 @@
                     DL Expiration
                 </label>
 
-                <input id="driver_license_expire_date" type="date" value="{{ employee.driver_license_expire_date or '' }}" name="driver_license_expire_date"
+                <input id="driver_license_expire_date" type="date"
+                    value="{{ employee.driver_license_expire_date or '' }}" name="driver_license_expire_date"
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
 
@@ -190,7 +207,8 @@
                     Other ID
                 </label>
 
-                <input id="other_id" type="text" name="other_id" value="{{ employee.other_id or '' }}" placeholder="ID type"
+                <input id="other_id" type="text" name="other_id" value="{{ employee.other_id or '' }}"
+                    placeholder="ID type"
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
 
@@ -220,7 +238,8 @@
                     SSN
                 </label>
 
-                <input id="ssn" type="text" name="ssn" maxlength="11"  value="{{ ssn or '' }}" placeholder="###-##-####" autocomplete="off"
+                <input id="ssn" type="text" name="ssn" maxlength="11" value="{{ ssn or '' }}" placeholder="###-##-####"
+                    autocomplete="off"
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
 
@@ -240,7 +259,8 @@
                     Insurance Expires
                 </label>
 
-                <input id="insurance_expires" type="date" value="{{ employee.insurance_expires or '' }}" name="insurance_expires"
+                <input id="insurance_expires" type="date" value="{{ employee.insurance_expires or '' }}"
+                    name="insurance_expires"
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
         </div>
@@ -280,7 +300,8 @@
                     State
                 </label>
 
-                <input id="state" type="text" name="state" maxlength="2" value="{{ employee.state or '' }}" placeholder="TX"
+                <input id="state" type="text" name="state" maxlength="2" value="{{ employee.state or '' }}"
+                    placeholder="TX"
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] uppercase text-[#1f2a2e] placeholder:text-[#6b7275] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
 
@@ -310,7 +331,7 @@
                     Departure Date
                 </label>
 
-                <input id="departure_date" type="date" value="{{ employee.departure_date or '' }}" name="departure_date"
+                <input id="departure_date" type="date" value="{{ employment_period.departure_date if employment_period else '' }}" name="departure_date"
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
 
@@ -320,7 +341,7 @@
                     Return Date
                 </label>
 
-                <input id="return_date" type="date" value="{{ employee.return_date or '' }}" name="return_date"
+                <input id="return_date" type="date" value="{{ employment_period.return_date if employment_period else '' }}" name="return_date"
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
         </div>
