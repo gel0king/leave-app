@@ -3,15 +3,23 @@
 
 <div class="rounded-[3px] border border-[#d9d3c4] bg-white px-[22px] py-5 shadow-sm">
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-semibold text-[#1e3f3d] m-0">Employees</h2>
-        <a href="{{ url_for('employees.new_employee') }}" class="px-4 py-2 bg-[#1e3f3d] text-white rounded-md text-sm font-medium hover:bg-[#16302d] transition-colors no-underline">+ Add New Employee</a>
+    <h2 class="text-2xl font-semibold text-[#1e3f3d] m-0">Employees</h2>
+    <div class="flex gap-3">
+        <a href="{{ url_for('employees.inactive_employees') }}"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors no-underline">
+            Inactive Employees
+        </a>
+        <a href="{{ url_for('employees.new_employee') }}"
+            class="px-4 py-2 bg-[#1e3f3d] text-white rounded-md text-sm font-medium hover:bg-[#16302d] transition-colors no-underline">
+            + Add New Employee
+        </a>
     </div>
-    {% if employees %}
+</div>
     <div class="mb-4">
         <input type="text" id="search-filter" placeholder="Search by employee name or employee number..."
-            class="w-full md:w-64 px-3 py-2 border border-[#d9d3c4] rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#2f5d5a]">
+            class="w-full  px-3 py-2 border border-[#d9d3c4] rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#2f5d5a]">
     </div>
-
+    {% if employees %}
     <div class="overflow-x-auto">
         <table class="w-full border-collapse" id="employees-table">
             <thead>
@@ -19,6 +27,7 @@
                     <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Employee #</th>
                     <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Name</th>
                     <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Dept</th>
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Status</th>
                     <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Hire Date</th>
                     <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">FTE Start Date</th>
                     <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Probation End</th>
@@ -32,6 +41,7 @@
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.employee_number or "" }}</td>
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.name }}</td>
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.office or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ e.employment_status or "" }}</td>
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.start_date or "" }}</td>
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.employment_date or "" }}</td>
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.probation_end_date or "" }}</td>
@@ -47,16 +57,14 @@
                                 </svg>
                             </a>
                             <form method="post" action="{{ url_for('employees.remove_employee', emp_id=e.id) }}"
-                                onsubmit="return confirm('Remove this employee?');" style="display:inline;">
-                                <button type="submit" title="Delete employee"
-                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors border-none cursor-pointer">
+                                class="delete-form" data-employee-name="{{ e.name }}" style="display:inline;">
+                                <button type="button" title="Deactivate employee"
+                                    class="delete-button inline-flex items-center justify-center w-8 h-8 rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors border-none cursor-pointer">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round">
                                         <polyline points="3 6 5 6 21 6"></polyline>
-                                        <path
-                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                        </path>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                         <line x1="10" y1="11" x2="10" y2="17"></line>
                                         <line x1="14" y1="11" x2="14" y2="17"></line>
                                     </svg>
@@ -69,44 +77,123 @@
         </table>
     </div>
     {% else %}
-        <p class="text-gray-500 italic">No employees yet.</p>
+    <p class="text-gray-500 italic">No employees yet.</p>
     {% endif %}
 </div>
-
+<div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+    <div id="delete-modal-backdrop" class="absolute inset-0 bg-black/40"></div>
+    <div class="relative z-10 w-full max-w-md mx-4 rounded-lg bg-white shadow-xl border border-[#d9d3c4]">
+        <div class="px-6 py-5">
+            <h3 class="text-lg font-semibold text-[#1e3f3d] m-0">Deactivate Employee</h3>
+        </div>
+        <div class="px-6 py-5">
+            <p class="text-sm text-gray-700">Are you sure you want to mark <span id="delete-employee-name" class="font-semibold text-[#1e3f3d]"></span> as inactive?</p>
+            <p class="text-xs text-gray-500 mt-3">
+                The employee will be removed from the active employee list,
+                but their records and history will remain in the system.
+            </p>
+        </div>
+        <div class="px-6 py-4 bg-gray-50 rounded-b-lg">
+            <div class="flex justify-end gap-3">
+                <button type="button" id="delete-cancel"
+                    class="px-4 py-2 rounded-md bg-white border border-[#d9d3c4] text-gray-700 text-sm font-medium hover:bg-gray-100">
+                    Cancel
+                </button>
+                <button type="button" id="delete-confirm"
+                    class="px-4 py-2 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-700">
+                    Deactivate Employee
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
-  // Fuzzy search
-  function fuzzyMatch(searchStr, targetStr) {
-    const search = searchStr.toLowerCase();
-    const target = targetStr.toLowerCase();
-    
-    if (search === '') return true;
-    if (target.includes(search)) return true;
-    
-    let searchIndex = 0;
-    for (let i = 0; i < target.length && searchIndex < search.length; i++) {
-      if (target[i] === search[searchIndex]) {
-        searchIndex++;
-      }
-    }
-    return searchIndex === search.length;
-  }
+    // Fuzzy search
+    function fuzzyMatch(searchStr, targetStr) {
+        const search = searchStr.toLowerCase();
+        const target = targetStr.toLowerCase();
 
-  function updateFilter() {
-    const searchInput = document.getElementById('search-filter');
-    const searchValue = searchInput.value.trim();
-    const rows = document.querySelectorAll('.employee-row');
-    
-    rows.forEach(row => {
-      const employeeName = row.getAttribute('data-employee');
-      const employeeNumber = row.getAttribute('data-employee-number');
-      if (fuzzyMatch(searchValue, employeeName) || fuzzyMatch(searchValue, employeeNumber)) {
-        row.style.display = '';
-      } else {
-        row.style.display = 'none';
-      }
+        if (search === '') return true;
+        if (target.includes(search)) return true;
+
+        let searchIndex = 0;
+        for (let i = 0; i < target.length && searchIndex < search.length; i++) {
+            if (target[i] === search[searchIndex]) {
+                searchIndex++;
+            }
+        }
+        return searchIndex === search.length;
+    }
+
+    function updateFilter() {
+        const searchInput = document.getElementById('search-filter');
+        const searchValue = searchInput.value.trim();
+        const rows = document.querySelectorAll('.employee-row');
+
+        rows.forEach(row => {
+            const employeeName = row.getAttribute('data-employee');
+            const employeeNumber = row.getAttribute('data-employee-number');
+            if (fuzzyMatch(searchValue, employeeName) || fuzzyMatch(searchValue, employeeNumber)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    document.getElementById('search-filter').addEventListener('input', updateFilter);
+
+    // Deactivate employee
+    const deleteModal = document.getElementById('delete-modal');
+    const deleteModalBackdrop = document.getElementById('delete-modal-backdrop');
+    const deleteCancel = document.getElementById('delete-cancel');
+    const deleteConfirm = document.getElementById('delete-confirm');
+    const deleteEmployeeName = document.getElementById('delete-employee-name');
+
+    let selectedDeleteForm = null;
+
+    function openDeleteModal(form) {
+        selectedDeleteForm = form;
+
+        deleteEmployeeName.textContent =
+            form.getAttribute('data-employee-name');
+
+        deleteModal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+
+        deleteConfirm.focus();
+    }
+
+    function closeDeleteModal() {
+        deleteModal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+
+        selectedDeleteForm = null;
+    }
+
+    document.querySelectorAll('.delete-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const form = this.closest('.delete-form');
+            openDeleteModal(form);
+        });
     });
-  }
-  
-  document.getElementById('search-filter').addEventListener('input', updateFilter);
+
+    deleteCancel.addEventListener('click', closeDeleteModal);
+    deleteModalBackdrop.addEventListener('click', closeDeleteModal);
+
+    deleteConfirm.addEventListener('click', function () {
+        if (selectedDeleteForm) {
+            selectedDeleteForm.submit();
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (
+            event.key === 'Escape' &&
+            !deleteModal.classList.contains('hidden')
+        ) {
+            closeDeleteModal();
+        }
+    });
 </script>
 {% endblock %}

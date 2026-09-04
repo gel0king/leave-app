@@ -12,7 +12,7 @@ employees_bp = Blueprint("employees", __name__)
 
 @employees_bp.route("/employees")
 def employees():
-    employees = Employee.query.order_by(Employee.name).all()
+    employees = Employee.query.filter(Employee.employment_status != "Inactive").order_by(Employee.name).all()
 
     return render_template("employees.html", employees=employees)
 
@@ -392,14 +392,56 @@ def edit_employee(emp_id):
 
     return redirect(url_for("employees.employees"))
 
-# TODO: Implement soft delete for employees.
-@employees_bp.route(
-    "/employees/<int:emp_id>/remove",
-    methods=["POST"]
-)
-def remove_employee(emp_id):
-    return render_template("employees.html")
+@employees_bp.route("/employees/inactive")
+def inactive_employees():
+    employees = (Employee.query.filter(Employee.employment_status == "Inactive").order_by(Employee.name).all())
+    return render_template("inactive_employees.html", employees=employees)
 
+@employees_bp.route("/employees/<int:emp_id>/remove", methods=["POST"])
+def remove_employee(emp_id):
+    employee = Employee.query.get_or_404(emp_id)
+
+    old_status = employee.employment_status
+    employee.employment_status = "Inactive"
+
+    # TODO: Change DEACTIVATE to something else to better represent a employee being marked inactive
+    create_log(
+        employee=employee,
+        action="DEACTIVATE",
+        description="Employee marked as inactive",
+        old_values={"employment_status": old_status,},
+        new_values={"employment_status": "Inactive",},
+    )
+    db.session.commit()
+    flash("Employee marked as inactive.", "success")
+
+    return redirect(url_for("employees.employees"))
+
+@employees_bp.route("/employees/<int:emp_id>/permanently-delete", methods=["POST"])
+def permanently_delete_employee(emp_id):    
+    employee = Employee.query.get_or_404(emp_id)
+
+    # Check for logs other than employee creation
+    meaningful_logs = [
+        log for log in employee.logs
+        if log.action not in ("CREATE", "DEACTIVATE")
+    ]
+
+    # Give error if employee has other logs
+    if meaningful_logs:
+        flash(
+            "This employee cannot be permanently deleted because they have existing history.",
+            "error"
+        )
+        return redirect(url_for("employees.inactive_employees"))
+    
+    db.session.delete(employee)
+    db.session.commit()
+    flash("Employee permanently deleted.", "success")
+
+    # No log created due to relationship cascade erasing all logs
+
+    return redirect(url_for("employees.inactive_employees"))
 
 def parse_date(value):
     if not value:
