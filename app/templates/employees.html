@@ -19,7 +19,7 @@
         <input type="text" id="search-filter" placeholder="Search by employee name or employee number..."
             class="w-full  px-3 py-2 border border-[#d9d3c4] rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#2f5d5a]">
     </div>
-    {% if employees %}
+    {% if rows %}
     <div class="overflow-x-auto">
         <table class="w-full border-collapse" id="employees-table">
             <thead>
@@ -31,20 +31,33 @@
                     <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Hire Date</th>
                     <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">FTE Start Date</th>
                     <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Probation End</th>
+                    {# TODO: Move to dashboard #}
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Annual Leave</th>
+                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Sick Leave</th>
+                    {# #}
                     <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]"></th>
                 </tr>
             </thead>
             <tbody>
-                {% for e in employees %}
+                {% for e, p in rows %}
                 <tr class="hover:bg-gray-50 transition-colors employee-row" data-employee="{{ e.name.lower() }}"
                     data-employee-number="{{ e.employee_number }}">
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.employee_number or "" }}</td>
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.name }}</td>
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.office or "" }}</td>
-                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ e.employment_status or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ p.employment_status or "" }}</td>
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.start_date or "" }}</td>
-                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.employment_date or "" }}</td>
-                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ e.probation_end_date or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ p.employment_date or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ p.probation_end_date or "" }}</td>
+                    {# TODO: Move to dashboard #}
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">
+                        {{ "%.1f"|format(balances[e.id].annual) }}
+                        {% if balances[e.id].annual_available != balances[e.id].annual %}
+                        <span class="text-xs text-gray-400">({{ "%.1f"|format(balances[e.id].annual_available) }} available.)</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ "%.1f"|format(balances[e.id].sick) }}</td>
+
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">
                         <div class="flex gap-3 items-center">
                             <a href="{{ url_for('employees.edit_employee', emp_id=e.id) }}" title="Edit employee"

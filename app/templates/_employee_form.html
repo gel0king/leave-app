@@ -158,6 +158,18 @@
                     value="{{ employment_period.starting_sick_leave if employment_period else '0' }}" name="sick_balance" required
                     class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
             </div>
+            
+            <!-- Leave Balance As Of -->
+            <div class="flex w-[170px] flex-col gap-1">
+                <label for="leave_balance_date" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">
+                    Balance As Of
+                </label>
+
+                <input id="leave_balance_date" type="date"
+                    value="{{ employment_period.leave_balance_date if employment_period and employment_period.leave_balance_date else (employment_period.employment_date if employment_period else '') }}"
+                    name="leave_balance_date"
+                    class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
+            </div>
         </div>
     </fieldset>
 
@@ -365,24 +377,20 @@
     document
         .getElementById("employment_date")
         .addEventListener("change", function () {
-            const probationEndInput =
-                document.getElementById("probation_end_date");
-            if (!probationEndInput.value) {
-                const startDate = new Date(this.value);
+            const probationEndInput = document.getElementById("probation_end_date");
 
-                if (!isNaN(startDate.getTime())) {
-                    const probationEnd = new Date(startDate);
-                    probationEnd.setMonth(probationEnd.getMonth() + 6);
+            if (!probationEndInput.value && this.value) {
+                const [year, month, day] = this.value.split("-").map(Number);
 
-                    const year = probationEnd.getFullYear();
-                    const month = String(probationEnd.getMonth() + 1).padStart(
-                        2,
-                        "0",
-                    );
-                    const day = String(probationEnd.getDate()).padStart(2, "0");
+                let newMonth = (month - 1) + 6; // 0-indexed, +6 months
+                const newYear = year + Math.floor(newMonth / 12);
+                newMonth = newMonth % 12;
 
-                    probationEndInput.value = `${year}-${month}-${day}`;
-                }
+                const yyyy = newYear;
+                const mm = String(newMonth + 1).padStart(2, "0");
+                const dd = String(day).padStart(2, "0");
+
+                probationEndInput.value = `${yyyy}-${mm}-${dd}`;
             }
         });
 

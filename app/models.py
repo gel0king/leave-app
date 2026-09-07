@@ -24,16 +24,6 @@ class Employee(db.Model):
         db.Date,
         nullable=False
     )
-    
-
-    # TODO: Remove after switching to new employment period table
-    employment_status = db.Column(db.String(100))
-    employment_date = db.Column(db.Date)
-    employment_history = db.Column(db.Text)
-    probation_end_date = db.Column(db.Date)
-    departure_date = db.Column(db.Date)
-    return_date = db.Column(db.Date)
-
 
     driver_license_state = db.Column(db.String(2))
     license_number = db.Column(db.Text)
@@ -196,6 +186,11 @@ class EmploymentPeriod(db.Model):
         db.Numeric(6, 1),
         nullable=False,
         default=0
+    )
+
+    leave_balance_date = db.Column(
+        db.Date,
+        nullable=True
     )
 
     end_date = db.Column(
