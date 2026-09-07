@@ -107,6 +107,10 @@ def add_employee_submit():
     departure_date = parse_date(request.form.get("departure_date"))
     return_date = parse_date(request.form.get("return_date"))
 
+    if employment_status == "Full Time" and employment_date is None:
+        flash("FTE Date is required for Full Time employees.", "error")
+        return redirect(request.url)    
+
     if employment_status != "Full Time":
         employment_date = None
         probation_end_date = None
@@ -354,6 +358,10 @@ def edit_employee(emp_id):
 
     if annual_leave is None or sick_leave is None:
         flash("Leave balances must be 0 or in 0.5 hour increments.", "error")
+        return redirect(request.url)
+
+    if employment_status == "Full Time" and employment_date is None:
+        flash("FTE Date is required for Full Time employees.", "error")
         return redirect(request.url)
 
     if employment_status != "Full Time":
