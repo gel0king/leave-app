@@ -13,7 +13,7 @@
         <input type="text" id="search-filter" placeholder="Search by employee name or employee number..."
             class="w-full  px-3 py-2 border border-[#d9d3c4] rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#2f5d5a]">
     </div>
-    {% if employees %}
+    {% if rows %}
     <div class="overflow-x-auto">
         <table class="w-full border-collapse">
             <thead>
@@ -28,13 +28,13 @@
                 </tr>
             </thead>
             <tbody>
-                {% for e in employees %}
+                {% for e, p in rows %}
                 <tr class="hover:bg-gray-50 transition-colors permanent-delete-row" data-employee="{{ e.name.lower() }}"
                     data-employee-number="{{ e.employee_number }}">
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ e.employee_number or "" }}</td>
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ e.name }}</td>
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ e.office or "" }}</td>
-                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ e.employment_status or "" }}</td>
+                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ p.employment_status or "" }}</td>
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">
                         <div class="flex gap-3 items-center">
                             <a href="{{ url_for('employees.edit_employee', emp_id=e.id, restore=1) }}"

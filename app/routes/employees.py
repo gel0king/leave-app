@@ -1,24 +1,43 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 
 from app.extensions import db
-from app.models import Employee
+from app.models import Employee, EmploymentPeriod
 from app.utils.encryption import encrypt, decrypt
 from app.utils.logging import create_log
-from app.utils.helper import parse_leave_hours
+from app.utils.helper import parse_leave_hours, parse_date, calculate_leave_balance
 
-from datetime import datetime
+from datetime import datetime, date, timedelta
+from decimal import Decimal
 
 employees_bp = Blueprint("employees", __name__)
 
 @employees_bp.route("/employees")
 def employees():
-    employees = Employee.query.filter(Employee.employment_status != "Inactive").order_by(Employee.name).all()
-
-    return render_template("employees.html", employees=employees)
+    latest_period_id = (
+        db.session.query(db.func.max(EmploymentPeriod.id))
+        .filter(EmploymentPeriod.employee_id == Employee.id)
+        .correlate(Employee).scalar_subquery()
+    )
+    rows = (
+        db.session.query(Employee, EmploymentPeriod)
+        .join(
+            EmploymentPeriod,
+            EmploymentPeriod.id == latest_period_id
+        )
+        .filter(EmploymentPeriod.employment_status != "Inactive")
+        .order_by(Employee.name)
+        .all()
+    )
+    # TODO: Move to dashboard page when dashboard is ready
+    balances = {
+        employee.id: calculate_leave_balance(employee)
+        for employee, period in rows
+    }
+    return render_template("employees.html", rows=rows, balances=balances)
 
 @employees_bp.route("/employees/new")
 def new_employee():
-    return render_template("new_employee.html")
+    return render_template("new_employee.html", employee=None, employment_period=None)
 
 @employees_bp.route("/employees/new", methods=["POST"])
 def add_employee_submit():
@@ -27,6 +46,30 @@ def add_employee_submit():
     employee_number = request.form.get("employee_number", "").strip()
     name = request.form.get("name", "").strip()
     start_date_string = request.form.get("start_date", "").strip()
+
+    if not start_date_string:
+        flash("Start date is required.", "error")
+        return redirect(request.url)
+
+    try:
+        employee_number = int(employee_number)
+    except ValueError:
+        flash("Employee number must be a valid number.", "error")
+        return redirect(request.url)
+
+    if Employee.query.filter_by(employee_number=employee_number).first():
+        flash(f"Employee number {employee_number} is already in use.", "error")
+        return redirect(request.url)
+
+    # Convert start date
+    try:
+        start_date = datetime.strptime(
+            start_date_string,
+            "%Y-%m-%d"
+        ).date()
+    except ValueError:
+        flash("Invalid start date.", "error")
+        return redirect(request.url)
 
     # Defaults
     employment_status = (
@@ -75,61 +118,46 @@ def add_employee_submit():
     # Encrypt sensitive fields
     ssn = encrypt(request.form.get("ssn", "").strip())
 
-    date_of_birth = encrypt(
-        request.form.get("date_of_birth", "").strip()
-    )
+    date_of_birth = encrypt(request.form.get("date_of_birth", "").strip())
 
-    license_number = encrypt(
-        request.form.get("license_number", "").strip()
-    )
+    license_number = encrypt(request.form.get("license_number", "").strip())
 
-    other_id_number = encrypt(
-        request.form.get("other_id_number", "").strip()
-    )
+    other_id_number = encrypt(request.form.get("other_id_number", "").strip())
 
-    address = encrypt(
-        request.form.get("address", "").strip()
-    )
+    address = encrypt(request.form.get("address", "").strip())
+
+    employment_date = parse_date(request.form.get("employment_date"))
+    probation_end_date = parse_date(request.form.get("probation_end_date"))
+    departure_date = parse_date(request.form.get("departure_date"))
+    return_date = parse_date(request.form.get("return_date"))
+
+    if employment_status == "Full Time" and employment_date is None:
+        flash("FTE Date is required for Full Time employees.", "error")
+        return redirect(request.url)    
+
+    if employment_status != "Full Time":
+        employment_date = None
+        probation_end_date = None
+
+    if annual_leave == 0 and sick_leave == 0:
+        leave_balance_date = None
+    else:
+        leave_balance_date = parse_date(
+            request.form.get("leave_balance_date")
+        ) or date.today()
 
     # Create employee
     employee = Employee(
-        employee_number=int(employee_number),
+        employee_number=employee_number,
         name=name,
         office=request.form.get("office", "").strip() or None,
 
-        starting_annual_leave=annual_leave,
-        starting_sick_leave=sick_leave,
-
         start_date=start_date,
 
-        employment_status=employment_status,
-        employment_date=parse_date(
-            request.form.get("employment_date")
-        ),
-        employment_history=employment_history,
-        probation_end_date=parse_date(
-            request.form.get("probation_end_date")
-        ),
-
-        departure_date=parse_date(
-            request.form.get("departure_date")
-        ),
-        return_date=parse_date(
-            request.form.get("return_date")
-        ),
-
-        driver_license_state=(
-            request.form.get("driver_license_state", "")
-            .strip()
-            .upper()
-            or None
-        ),
+        driver_license_state=(request.form.get("driver_license_state", "").strip().upper() or None),
 
         license_number=license_number,
-
-        driver_license_expire_date=parse_date(
-            request.form.get("driver_license_expire_date")
-        ),
+        driver_license_expire_date=parse_date(request.form.get("driver_license_expire_date")),
 
         other_id=request.form.get("other_id", "").strip() or None,
         other_id_number=other_id_number,
@@ -137,24 +165,34 @@ def add_employee_submit():
         ssn=ssn,
         date_of_birth=date_of_birth,
 
-        insurance_expires=parse_date(
-            request.form.get("insurance_expires")
-        ),
+        insurance_expires=parse_date(request.form.get("insurance_expires")),
 
         address=address,
         city=request.form.get("city", "").strip() or None,
 
-        state=(
-            request.form.get("state", "")
-            .strip()
-            .upper()
-            or None
-        ),
+        state=(request.form.get("state", "").strip().upper() or None),
 
         zip=request.form.get("zip", "").strip() or None,
     )
 
     db.session.add(employee)
+
+    employment_period = EmploymentPeriod(
+        employee=employee,
+        start_date=start_date,
+        employment_date=employment_date,
+        employment_status=employment_status,
+        employment_history=employment_history,
+        probation_end_date=probation_end_date,
+        starting_annual_leave=annual_leave,
+        starting_sick_leave=sick_leave,
+        leave_balance_date=leave_balance_date,
+        end_date=None,
+        departure_date=departure_date,
+        return_date=return_date,
+    )
+    db.session.add(employment_period)
+
     create_log(
         employee=employee,
         action="CREATE",
@@ -164,17 +202,14 @@ def add_employee_submit():
             "name": employee.name,
             "office": employee.office,
 
-            "starting_annual_leave": employee.starting_annual_leave,
-            "starting_sick_leave": employee.starting_sick_leave,
-
             "start_date": employee.start_date,
-            "employment_status": employee.employment_status,
-            "employment_date": employee.employment_date,
-            "employment_history": employee.employment_history,
-            "probation_end_date": employee.probation_end_date,
+            "employment_status": employment_status,
+            "employment_date": employment_date,
+            "employment_history": employment_history,
+            "probation_end_date": probation_end_date,
 
-            "departure_date": employee.departure_date,
-            "return_date": employee.return_date,
+            "departure_date": departure_date,
+            "return_date": return_date,
 
             "driver_license_state": employee.driver_license_state,
             "license_number": employee.license_number,
@@ -203,15 +238,16 @@ def add_employee_submit():
         url_for("employees.employees")
     )
 
-
 @employees_bp.route("/employees/<int:emp_id>/edit", methods=["GET", "POST"])
 def edit_employee(emp_id):
     employee = Employee.query.get_or_404(emp_id)
+    employment_period = (EmploymentPeriod.query.filter_by(employee_id=employee.id).order_by(EmploymentPeriod.start_date.desc()).first())
 
     if request.method == "GET":
         return render_template(
             "edit_employee.html",
             employee=employee,
+            employment_period=employment_period,
             ssn=decrypt(employee.ssn) if employee.ssn else "",
             date_of_birth=decrypt(employee.date_of_birth)
             if employee.date_of_birth else "",
@@ -228,18 +264,18 @@ def edit_employee(emp_id):
         "name": employee.name,
         "office": employee.office,
 
-        "starting_annual_leave": employee.starting_annual_leave,
-        "starting_sick_leave": employee.starting_sick_leave,
+        "starting_annual_leave": employment_period.starting_annual_leave,
+        "starting_sick_leave": employment_period.starting_sick_leave,
 
         "start_date": employee.start_date,
 
-        "employment_status": employee.employment_status,
-        "employment_date": employee.employment_date,
-        "employment_history": employee.employment_history,
-        "probation_end_date": employee.probation_end_date,
+        "employment_status": employment_period.employment_status,
+        "employment_date": employment_period.employment_date,
+        "employment_history": employment_period.employment_history,
+        "probation_end_date": employment_period.probation_end_date,
 
-        "departure_date": employee.departure_date,
-        "return_date": employee.return_date,
+        "departure_date": employment_period.departure_date,
+        "return_date": employment_period.return_date,
 
         "driver_license_state": employee.driver_license_state,
         "license_number": (decrypt(employee.license_number) if employee.license_number else ""),
@@ -263,8 +299,6 @@ def edit_employee(emp_id):
     start_date_string = request.form.get("start_date", "").strip()
     employment_status = (request.form.get("employment_status", "").strip() or "Seasonal")
     employment_history = (request.form.get("employment_history", "").strip() or "New Hire")
-    annual_hours = request.form.get("annual_balance", "0").strip()
-    sick_hours = request.form.get("sick_balance", "0").strip()
 
     if not employee_number_string:
         flash("Employee number is required.", "error")
@@ -284,17 +318,19 @@ def edit_employee(emp_id):
         flash("Employee number must be a valid number.", "error")
         return redirect(request.url)
 
+    existing = Employee.query.filter(
+        Employee.employee_number == employee_number,
+        Employee.id != employee.id
+    ).first()
+
+    if existing:
+        flash(f"Employee number {employee_number} is already in use.", "error")
+        return redirect(request.url)
+
     try:
         start_date = datetime.strptime(start_date_string, "%Y-%m-%d").date()
     except ValueError:
         flash("Invalid start date.", "error")
-        return redirect(request.url)
-
-    annual_leave = parse_leave_hours(annual_hours)
-    sick_leave = parse_leave_hours(sick_hours)
-
-    if annual_leave is None or sick_leave is None:
-        flash("Leave balances must be in 0.5 hour increments.", "error")
         return redirect(request.url)
 
     ssn = request.form.get("ssn", "").strip()
@@ -306,16 +342,7 @@ def edit_employee(emp_id):
     employee.employee_number = employee_number
     employee.name = name
     employee.office = (request.form.get("office", "").strip() or None)
-    employee.starting_annual_leave = annual_leave
-    employee.starting_sick_leave = sick_leave
     employee.start_date = start_date
-    employee.employment_status = employment_status
-    employee.employment_date = parse_date(request.form.get("employment_date"))
-    employee.employment_history = employment_history
-    employee.probation_end_date = parse_date(request.form.get("probation_end_date"))
-
-    employee.departure_date = parse_date(request.form.get("departure_date"))
-    employee.return_date = parse_date(request.form.get("return_date"))
 
     employee.driver_license_state = (request.form.get("driver_license_state", "").strip().upper() or None)
     employee.license_number = (encrypt(license_number) if license_number else None)
@@ -332,23 +359,99 @@ def edit_employee(emp_id):
     employee.state = (request.form.get("state", "").strip().upper() or None)
     employee.zip = (request.form.get("zip", "").strip() or None)
 
+    employment_date = parse_date(request.form.get("employment_date"))
+    probation_end_date = parse_date(request.form.get("probation_end_date"))
+    departure_date = parse_date(request.form.get("departure_date"))
+    return_date = parse_date(request.form.get("return_date"))
+    annual_leave = parse_leave_hours(request.form.get("annual_balance", "0").strip())
+    sick_leave = parse_leave_hours(request.form.get("sick_balance", "0").strip())
+
+    if annual_leave is None or sick_leave is None:
+        flash("Leave balances must be 0 or in 0.5 hour increments.", "error")
+        return redirect(request.url)
+
+    old_annual = employment_period.starting_annual_leave if employment_period else None
+    old_sick = employment_period.starting_sick_leave if employment_period else None
+
+    balances_changed = (
+        old_annual is None
+        or old_sick is None
+        or annual_leave != Decimal(old_annual)
+        or sick_leave != Decimal(old_sick)
+    )
+
+    if annual_leave == 0 and sick_leave == 0:
+        leave_balance_date = None
+    elif balances_changed:
+        leave_balance_date = parse_date(
+            request.form.get("leave_balance_date")
+        ) or date.today()
+    else:
+        leave_balance_date = employment_period.leave_balance_date if employment_period else None
+
+    if annual_leave is None or sick_leave is None:
+        flash("Leave balances must be 0 or in 0.5 hour increments.", "error")
+        return redirect(request.url)
+
+    if employment_status == "Full Time" and employment_date is None:
+        flash("FTE Date is required for Full Time employees.", "error")
+        return redirect(request.url)
+
+    if employment_status != "Full Time":
+        employment_date = None
+        probation_end_date = None
+
+    status_changed = (
+        employment_period is not None
+        and employment_period.employment_status != employment_status
+    )
+
+    if employment_period is None or status_changed:
+        new_period_start = employment_date or date.today()
+
+        if employment_period is not None:
+            period_end = new_period_start - timedelta(days=1)
+            if period_end < employment_period.start_date:
+                period_end = employment_period.start_date
+            employment_period.end_date = period_end
+
+        employment_period = EmploymentPeriod(
+            employee=employee,
+            start_date=new_period_start,
+            starting_annual_leave=annual_leave,
+            starting_sick_leave=sick_leave,
+            leave_balance_date=leave_balance_date,
+        )
+        db.session.add(employment_period)
+
+    employment_period.employment_date = employment_date
+    employment_period.employment_status = employment_status
+    employment_period.employment_history = employment_history
+    employment_period.probation_end_date = probation_end_date
+    employment_period.starting_annual_leave = annual_leave
+    employment_period.starting_sick_leave = sick_leave
+    employment_period.leave_balance_date = leave_balance_date
+    employment_period.departure_date = departure_date
+    employment_period.return_date = return_date
+
+
     new_values = {
         "employee_number": employee.employee_number,
         "name": employee.name,
         "office": employee.office,
 
-        "starting_annual_leave": employee.starting_annual_leave,
-        "starting_sick_leave": employee.starting_sick_leave,
+        "starting_annual_leave": employment_period.starting_annual_leave if employment_period else None,
+        "starting_sick_leave": employment_period.starting_sick_leave if employment_period else None,
 
         "start_date": employee.start_date,
 
-        "employment_status": employee.employment_status,
-        "employment_date": employee.employment_date,
-        "employment_history": employee.employment_history,
-        "probation_end_date": employee.probation_end_date,
+        "employment_status": employment_period.employment_status if employment_period else None,
+        "employment_date": employment_period.employment_date if employment_period else None,
+        "employment_history": employment_period.employment_history if employment_period else None,
+        "probation_end_date": employment_period.probation_end_date if employment_period else None,
 
-        "departure_date": employee.departure_date,
-        "return_date": employee.return_date,
+         "departure_date": employment_period.departure_date if employment_period else None,
+        "return_date": employment_period.return_date if employment_period else None,
 
         "driver_license_state": employee.driver_license_state,
         "license_number": license_number,
@@ -394,28 +497,78 @@ def edit_employee(emp_id):
 
 @employees_bp.route("/employees/inactive")
 def inactive_employees():
-    employees = (Employee.query.filter(Employee.employment_status == "Inactive").order_by(Employee.name).all())
-    return render_template("inactive_employees.html", employees=employees)
+    latest_period_id = (
+        db.session.query(db.func.max(EmploymentPeriod.id))
+        .filter(EmploymentPeriod.employee_id == Employee.id)
+        .correlate(Employee)
+        .scalar_subquery()
+    )
+    rows = (
+        db.session.query(Employee, EmploymentPeriod)
+        .join(
+            EmploymentPeriod,
+            EmploymentPeriod.id == latest_period_id
+        )
+        .filter(EmploymentPeriod.employment_status == "Inactive")
+        .order_by(Employee.name)
+        .all()
+    )
+    return render_template(
+        "inactive_employees.html",
+        rows=rows
+    )
 
 @employees_bp.route("/employees/<int:emp_id>/remove", methods=["POST"])
 def remove_employee(emp_id):
     employee = Employee.query.get_or_404(emp_id)
 
-    old_status = employee.employment_status
-    employee.employment_status = "Inactive"
+    employment_period = (
+        EmploymentPeriod.query
+        .filter_by(employee_id=employee.id)
+        .order_by(EmploymentPeriod.start_date.desc(), EmploymentPeriod.id.desc())
+        .first()
+    )
+    if employment_period is None:
+        flash("This employee does not have an employment period.", "error")
+        return redirect(url_for("employees.employees"))
 
-    # TODO: Change DEACTIVATE to something else to better represent a employee being marked inactive
+    old_status = employment_period.employment_status
+
+    if old_status == "Inactive":
+        flash("Employee is already inactive.", "success")
+        return redirect(url_for("employees.employees"))
+
+    today = date.today()
+    period_end = max(today, employment_period.start_date)
+    employment_period.end_date = period_end
+
+    inactive_period = EmploymentPeriod(
+        employee=employee,
+        start_date=today,
+        employment_date=None,
+        employment_status="Inactive",
+        employment_history=employment_period.employment_history,
+        probation_end_date=None,
+        starting_annual_leave=employment_period.starting_annual_leave,
+        starting_sick_leave=employment_period.starting_sick_leave,
+        end_date=None,
+        departure_date=employment_period.departure_date,
+        return_date=employment_period.return_date,
+    )
+    db.session.add(inactive_period)
+
     create_log(
         employee=employee,
         action="DEACTIVATE",
         description="Employee marked as inactive",
-        old_values={"employment_status": old_status,},
-        new_values={"employment_status": "Inactive",},
+        old_values={"employment_status": old_status},
+        new_values={"employment_status": "Inactive"},
     )
+
     db.session.commit()
     flash("Employee marked as inactive.", "success")
-
     return redirect(url_for("employees.employees"))
+
 
 @employees_bp.route("/employees/<int:emp_id>/permanently-delete", methods=["POST"])
 def permanently_delete_employee(emp_id):    
@@ -442,15 +595,3 @@ def permanently_delete_employee(emp_id):
     # No log created due to relationship cascade erasing all logs
 
     return redirect(url_for("employees.inactive_employees"))
-
-def parse_date(value):
-    if not value:
-        return None
-
-    try:
-        return datetime.strptime(
-            value,
-            "%Y-%m-%d"
-        ).date()
-    except ValueError:
-        return None
