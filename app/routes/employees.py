@@ -47,6 +47,30 @@ def add_employee_submit():
     name = request.form.get("name", "").strip()
     start_date_string = request.form.get("start_date", "").strip()
 
+    if not start_date_string:
+        flash("Start date is required.", "error")
+        return redirect(request.url)
+
+    try:
+        employee_number = int(employee_number)
+    except ValueError:
+        flash("Employee number must be a valid number.", "error")
+        return redirect(request.url)
+
+    if Employee.query.filter_by(employee_number=employee_number).first():
+        flash(f"Employee number {employee_number} is already in use.", "error")
+        return redirect(request.url)
+
+    # Convert start date
+    try:
+        start_date = datetime.strptime(
+            start_date_string,
+            "%Y-%m-%d"
+        ).date()
+    except ValueError:
+        flash("Invalid start date.", "error")
+        return redirect(request.url)
+
     # Defaults
     employment_status = (
         request.form.get("employment_status", "").strip()
@@ -124,7 +148,7 @@ def add_employee_submit():
 
     # Create employee
     employee = Employee(
-        employee_number=int(employee_number),
+        employee_number=employee_number,
         name=name,
         office=request.form.get("office", "").strip() or None,
 
@@ -292,6 +316,15 @@ def edit_employee(emp_id):
         employee_number = int(employee_number_string)
     except ValueError:
         flash("Employee number must be a valid number.", "error")
+        return redirect(request.url)
+
+    existing = Employee.query.filter(
+        Employee.employee_number == employee_number,
+        Employee.id != employee.id
+    ).first()
+
+    if existing:
+        flash(f"Employee number {employee_number} is already in use.", "error")
         return redirect(request.url)
 
     try:
