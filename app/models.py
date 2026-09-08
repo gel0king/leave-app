@@ -123,6 +123,7 @@ class Log(db.Model):
     old_values = db.Column(db.Text)
     new_values = db.Column(db.Text)
     notes = db.Column(db.Text)
+    attachment_path = db.Column(db.Text)
 
     time_created = db.Column(
     db.DateTime,
