@@ -2,6 +2,9 @@ from decimal import Decimal, InvalidOperation
 from flask import flash
 from datetime import datetime, date
 import calendar
+from app.extensions import db
+from sqlalchemy import func
+from app.models import Log, LeaveType
 
 ANNUAL_LEAVE_TIERS = [
     # min_years, hours_per_month, max_carryover
@@ -190,6 +193,9 @@ def calculate_leave_balance(employee, as_of_date=None):
 
             cursor = _add_months(cursor, 1)
 
+    annual -= get_used_hours(employee, "Annual Leave", as_of_date)
+    sick -= get_used_hours(employee, "Sick Leave", as_of_date)
+
     if period.probation_end_date and as_of_date < period.probation_end_date:
         annual_available = Decimal("0")
     else:
@@ -209,3 +215,21 @@ def parse_date(value):
         return datetime.strptime(value, "%Y-%m-%d").date()
     except ValueError:
         return None
+
+def get_used_hours(employee, leave_type_name, as_of_date=None):
+
+    if as_of_date is None:
+        as_of_date = date.today()
+
+    total = (
+        db.session.query(func.coalesce(func.sum(Log.hours), 0))
+        .join(LeaveType, Log.leave_type_id == LeaveType.id)
+        .filter(
+            Log.employee_id == employee.id,
+            Log.action == "USED",
+            LeaveType.name == leave_type_name,
+            Log.start_date <= as_of_date,
+        )
+        .scalar()
+    )
+    return Decimal(total or 0)

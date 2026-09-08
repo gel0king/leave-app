@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="rounded-[3px] border border-[#d9d3c4] bg-white px-[22px] py-5 shadow-sm">
+    <h2 class="mb-4 border-b border-[#d9d3c4] pb-2.5 text-[13px] font-semibold uppercase tracking-[0.06em] text-[#6b7275]">
+        Leave Request
+    </h2>
+    <form method="post" action="{{ url_for('form.form_submit') }}">
+        <fieldset class="mb-6">
+            <legend class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]">
+                Request Details
+            </legend>
+            <div class="flex flex-wrap items-end gap-3">
+                <div class="flex min-w-[220px] flex-1 flex-col gap-1">
+                    <label for="employee_id" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">Employee</label>
+                    <select id="employee_id" name="employee_id" required
+                        class="rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1">
+                        <option value="" disabled selected>Select an employee</option>
+                        {% for e in employees %}
+                        <option value="{{ e.id }}">{{ e.name }} (#{{ e.employee_number }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex min-w-[220px] flex-1 flex-col gap-1">
+                    <label for="leave_type" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">Leave Type</label>
+                    <select id="leave_type" name="leave_type" required
+                        onchange="document.getElementById('other-specify-wrap').classList.toggle('hidden', this.value !== 'Other')"
+                        class="rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1">
+                        <option value="" disabled selected>Select a leave type</option>
+                        {% for lt in leave_types %}
+                        <option value="{{ lt }}">{{ lt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="other-specify-wrap" class="hidden flex min-w-[220px] flex-1 flex-col gap-1">
+                    <label for="leave_other_specify" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">Specify Other</label>
+                    <input id="leave_other_specify" type="text" name="leave_other_specify"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="mb-6">
+            <legend class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]">
+                Dates &amp; Hours
+            </legend>
+            <div class="flex flex-wrap items-end gap-3">
+                <div class="flex w-[155px] flex-col gap-1">
+                    <label for="from_date" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">From Date</label>
+                    <input id="from_date" type="date" name="from_date" required
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
+                </div>
+                <div class="flex w-[130px] flex-col gap-1">
+                    <label for="from_time" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">From Time</label>
+                    <input id="from_time" type="time" name="from_time"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
+                </div>
+                <div class="flex w-[155px] flex-col gap-1">
+                    <label for="to_date" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">To Date</label>
+                    <input id="to_date" type="date" name="to_date"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
+                </div>
+                <div class="flex w-[130px] flex-col gap-1">
+                    <label for="to_time" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">To Time</label>
+                    <input id="to_time" type="time" name="to_time"
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
+                </div>
+                <div class="flex w-[130px] flex-col gap-1">
+                    <label for="total_hours" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">Total Hours</label>
+                    <input id="total_hours" type="number" step="0.5" min="0.5" name="total_hours" required
+                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="mb-6">
+            <legend class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]">
+                Comments
+            </legend>
+            <textarea name="comments" rows="3"
+                class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"></textarea>
+        </fieldset>
+        <div class="flex items-center gap-3 border-t border-[#d9d3c4] pt-5">
+            <button type="submit"
+                class="rounded-[3px] border-0 bg-[#2f5d5a] px-[18px] py-[9px] text-[13px] font-semibold tracking-[0.02em] text-white transition-colors hover:bg-[#1e3f3d] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1">
+                Submit Request
+            </button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,4 +1,5 @@
 {
     "DATABASE": "./certificates.db",
-    "FORM": "./leave_request_template.pdf"
+    "FORM": "./leave_request_template.pdf",
+    "LEAVE_REQUESTS": "./leave_requests"
 }

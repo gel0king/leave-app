@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="rounded-[3px] border border-[#d9d3c4] bg-white px-[22px] py-5 shadow-sm">
+    <h2 class="mb-4 text-[13px] font-semibold uppercase tracking-[0.06em] text-[#6b7275]">
+        Leave Request Submitted
+    </h2>
+    <p class="mb-4 text-sm text-gray-700">
+        {{ log.employee.name }}'s leave request has been recorded. Use the viewer below to save or print it.
+    </p>
+    <div class="flex gap-3 mb-4">
+        <a href="{{ url_for('form.download_request_pdf', log_id=log.id) }}" target="_blank"
+            class="px-4 py-2 bg-[#1e3f3d] text-white rounded-md text-sm font-medium hover:bg-[#16302d] transition-colors no-underline">
+            Open in New Tab
+        </a>
+        <a href="{{ url_for('form.form') }}"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors no-underline">
+            New Request
+        </a>
+    </div>
+    <iframe src="{{ url_for('form.download_request_pdf', log_id=log.id) }}"
+        class="w-full h-[800px] border border-[#d9d3c4] rounded-[3px]"></iframe>
+</div>
+
+{% endblock %}

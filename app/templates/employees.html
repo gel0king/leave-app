@@ -57,7 +57,7 @@
                         {% endif %}
                     </td>
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">{{ "%.1f"|format(balances[e.id].sick) }}</td>
-
+                    {# #}
                     <td class="px-4 py-3 text-sm border-b border-[#d9d3c4] ">
                         <div class="flex gap-3 items-center">
                             <a href="{{ url_for('employees.edit_employee', emp_id=e.id) }}" title="Edit employee"
