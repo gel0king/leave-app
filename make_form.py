@@ -1,10 +1,16 @@
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.colors import HexColor, black
+import fitz
 
 OUT = "./leave_request_template.pdf"
 INK = black
 LINE = HexColor("#333333")
+
+# ---------- Font sizes ----------
+LABEL_SIZE = 12
+SMALL_LABEL_SIZE = 10
+FIELD_FONT_SIZE = 11
 
 W, H = letter
 c = canvas.Canvas(OUT, pagesize=letter)
@@ -16,9 +22,10 @@ def center(text, y, size=14, bold=True):
     c.drawCentredString(W / 2, y, text)
 
 
-def label(x, y, text, size=11, bold=False, font="Times-Roman"):
+def label(x, y, text, size=LABEL_SIZE, bold=False, font="Times-Roman"):
     c.setFont(("Times-Bold" if bold else font), size)
     c.drawString(x, y, text)
+
 
 
 def box(x, y, w, h):
@@ -48,15 +55,55 @@ def checkbox(name, x, y, size=11, tooltip=None):
     )
 
 
-def text_field(name, x, y, w, h=14, tooltip=None, font_size=9, value=""):
+def text_field(name, x, y, w, h=16, tooltip=None, font_size=11, value=""):
     form.textfield(
-        name=name, tooltip=tooltip or name,
-        x=x, y=y, width=w, height=h,
-        borderStyle="underlined", borderColor=LINE, borderWidth=0.75,
-        fillColor=None, textColor=INK, fontSize=font_size, forceBorder=True,
+        name=name,
+        tooltip=tooltip or name,
+        x=x,
+        y=y,
+        width=w,
+        height=h,
+        borderStyle="underlined",
+        borderColor=LINE,
+        borderWidth=0.75,
+        fillColor=None,
+        textColor=INK,
+        fontSize=font_size,
+        forceBorder=True,
         value=value,
     )
 
+def center_form_fields(pdf_path, field_names):
+    doc = fitz.open(pdf_path)
+
+    for page in doc:
+        widgets = page.widgets()
+
+        if widgets is None:
+            continue
+
+        for widget in widgets:
+            if widget.field_name in field_names:
+                widget.text_fontsize = 11
+                widget.field_flags = widget.field_flags
+                widget.text_font = "Times-Roman"
+
+                widget.field_flags = widget.field_flags
+                widget.update()
+
+                xref = widget.xref
+                doc.xref_set_key(xref, "Q", "1")
+
+    doc.save(
+        pdf_path + ".tmp",
+        garbage=4,
+        deflate=True,
+    )
+
+    doc.close()
+
+    import os
+    os.replace(pdf_path + ".tmp", pdf_path)
 
 def generate_leave_form_template(output_path):
     # ---------- Title ---------- 
@@ -116,7 +163,7 @@ def generate_leave_form_template(output_path):
     label(col1_x + 16, row3_y - 10, "(attach summons)", size=7.5)
     checkbox("leave_other", col2_x, row3_y - 3)
     label(col2_x + 16, row3_y, "Other")
-    text_field("leave_other_specify", col2_x + 46, row3_y - 4, 95, h=12, font_size=8)
+    text_field("leave_other_specify", col2_x + 46, row3_y - 4, 140, h=14, font_size=11)
     checkbox("leave_holiday", col3_x, row3_y - 3)
     label(col3_x + 16, row3_y, "Holiday leave taken", size=9)
     label(col3_x + 16, row3_y - 10, "(Regional office use only)", size=7)
@@ -141,30 +188,50 @@ def generate_leave_form_template(output_path):
     y -= note_h
 
     # Row: hours / from / to
-    hrow_h = 34
+    hrow_h = 42
     box(left, y - hrow_h, right - left, hrow_h)
-    label(left + 4, y - 14, "No. of hours:")
-    text_field("total_hours", left + 4, y - 30, 90, h=13)
 
-    label(left + 105, y - 14, "From (Time):")
-    text_field("from_time", left + 105, y - 30, 90, h=13)
-    label(left + 210, y - 14, "Date:")
-    text_field("from_date", left + 210, y - 30, 100, h=13)
+    section_w = (right - left) / 5
+    field_w = 70
+    field_h = 16
 
-    label(left + 340, y - 14, "To (Time):")
-    text_field("to_time", left + 340, y - 30, 90, h=13)
-    label(left + 445, y - 14, "Date:")
-    text_field("to_date", left + 445, y - 30, right - (left + 445) - 4, h=13)
+    sections = [
+        ("No. of hours:", "total_hours"),
+        ("From (Time):", "from_time"),
+        ("Date:", "from_date"),
+        ("To (Time):", "to_time"),
+        ("Date:", "to_date"),
+    ]
+
+    for i, (caption, field_name) in enumerate(sections):
+        center_x = left + section_w * i + section_w / 2
+
+        # Center the label
+        c.setFont("Times-Roman", 11)
+        c.drawCentredString(center_x, y - 15, caption)
+
+        # Center the input box
+        field_x = center_x - field_w / 2
+
+        text_field(
+            field_name,
+            field_x,
+            y - 35,
+            field_w,
+            h=field_h,
+            font_size=11,
+        )
+
     y -= hrow_h
+
+    y -= 14  # gap between tables
 
     # Row: comments
     crow_h = 40
     box(left, y - crow_h, right - left, crow_h)
     label(left + 4, y - 14, "Comments (optional).  Use for giving additional information:")
-    text_field("comments", left + 4, y - crow_h + 6, right - left - 8, h=14, font_size=8)
+    text_field("comments", left + 4, y - crow_h + 8, right - left - 8, h=16, font_size=10)
     y -= crow_h
-
-    y -= 14  # gap between tables
 
     # Emergency contact block
     ec_h = 55
@@ -211,4 +278,16 @@ def generate_leave_form_template(output_path):
 
     c.showPage()
     c.save()
-    print(f"Wrote {OUT}")
+
+    center_form_fields(
+    output_path,
+        [
+            "total_hours",
+            "from_time",
+            "from_date",
+            "to_time",
+            "to_date",
+        ],
+    )
+
+    print(f"Wrote {output_path}")

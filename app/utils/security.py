@@ -1,25 +1,24 @@
 import os
 import secrets
-from pathlib import Path
 
 from dotenv import load_dotenv, set_key
 
+from app.utils.config import ENV_PATH
 
-BASE_DIR = Path(__file__).resolve().parents[2]
-ENV_FILE = BASE_DIR / ".env"
 
-load_dotenv(ENV_FILE)
+load_dotenv(ENV_PATH)
 
 
 def get_or_create_secret(name):
-    
     value = os.getenv(name)
 
     if not value:
         value = secrets.token_urlsafe(32)
 
+        ENV_PATH.parent.mkdir(parents=True, exist_ok=True)
+
         set_key(
-            str(ENV_FILE),
+            str(ENV_PATH),
             name,
             value
         )
