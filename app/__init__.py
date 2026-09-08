@@ -34,7 +34,7 @@ def seed_leave_types():
     db.session.commit()
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder="templates",)
 
     app.config["SECRET_KEY"] = get_or_create_secret("FLASK_SECRET_KEY")
     
