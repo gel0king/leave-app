@@ -257,24 +257,40 @@ def generate_leave_form_template(output_path):
     y -= sig_h + 12
 
     # Approvals block
-    appr_h = 55
+    appr_h = 115
     box(left, y - appr_h, right - left, appr_h)
+
     label(left + 4, y - 14, "Approvals", bold=True, size=12)
     hline(left, right, y - 22)
 
-    checkbox("supervisor_approved", left + 20, y - 36)
-    label(left + 36, y - 34, "APPROVED", size=10)
-    checkbox("supervisor_disapproved", left + 130, y - 36)
-    label(left + 146, y - 34, "DISAPPROVED", size=10)
-    label(left + 250, y - 34, "Supervisor's signature", size=10)
-    text_field("supervisor_signature", left + 400, y - 37, right - (left + 400) - 4, h=14, font_size=9)
+    approval_x = left + 20
+    signature_label_x = left + 250
+    signature_x = left + 370
+    signature_w = right - signature_x - 12
 
-    checkbox("director_approved", left + 20, y - 50)
-    label(left + 36, y - 48, "APPROVED", size=10)
-    checkbox("director_disapproved", left + 130, y - 50)
-    label(left + 146, y - 48, "DISAPPROVED", size=10)
-    label(left + 250, y - 48, "Director's signature", size=10)
-    text_field("director_signature", left + 400, y - 51, right - (left + 400) - 4, h=14, font_size=9)
+    # Supervisor
+    checkbox("supervisor_approved", approval_x, y - 58)
+    label(approval_x + 16, y - 56, "APPROVED", size=10)
+
+    checkbox("supervisor_disapproved", approval_x + 110, y - 58)
+    label(approval_x + 126, y - 56, "DISAPPROVED", size=10)
+
+    label(signature_label_x, y - 56, "Supervisor's signature", size=10)
+
+    hline(signature_x, signature_x + signature_w, y - 56)
+
+    # Director
+    checkbox("director_approved", approval_x, y - 98)
+    label(approval_x + 16, y - 96, "APPROVED", size=10)
+
+    checkbox("director_disapproved", approval_x + 110, y - 98)
+    label(approval_x + 126, y - 96, "DISAPPROVED", size=10)
+
+    label(signature_label_x, y - 96, "Director's signature", size=10)
+
+    hline(signature_x, signature_x + signature_w, y - 96)
+
+    y -= appr_h + 12
 
     c.showPage()
     c.save()

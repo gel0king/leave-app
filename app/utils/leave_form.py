@@ -36,7 +36,7 @@ def fill_leave_request_pdf(employee, leave_type_name, other_specify, total_hours
     writer.append(reader)
 
     field_values = {
-        "employee_name": f"{employee.name} #{employee.employee_number}",
+        "employee_name": f"#{employee.employee_number} {employee.name}",
         "date_of_request": date.today().strftime("%m/%d/%Y"),
         "total_hours": str(total_hours),
         "from_time": format_time_12h(from_time),
