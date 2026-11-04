@@ -1,26 +1,271 @@
 <!doctype html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Leave App</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
+
 <body class="m-0 bg-[#f6f4ef] text-[#1f2a2e] font-sans text-[14px] leading-6 antialiased">
-  <header class="flex items-baseline justify-between border-b-[3px] border-[#b5772f] bg-[#1e3f3d] px-8 py-5 text-[#f6f4ef]">
-    <h1 class="m-0 text-[19px] font-semibold uppercase tracking-[0.04em]">Leave App</h1>
-    
+
+  <header
+    class="flex items-center justify-between border-b-[3px] border-[#b5772f] bg-[#1e3f3d] px-8 py-5 text-[#f6f4ef]">
+
+    <h1 class="m-0 text-[19px] font-semibold uppercase tracking-[0.04em]">
+      Leave App
+    </h1>
+
+    <div class="relative" id="notification-container">
+
+      <button type="button" id="notification-toggle"
+        class="relative flex h-10 w-10 items-center justify-center rounded-full text-white transition hover:bg-white/10"
+        aria-label="Notifications" aria-expanded="false">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+          <path d="M10 21h4" />
+        </svg>
+
+        <span id="notification-badge"
+          class="absolute right-0 top-0 hidden min-w-4 rounded-full bg-[#b5772f] px-1 text-center text-[10px] font-bold leading-4 text-white"></span>
+      </button>
+
+      <div id="notification-dropdown"
+        class="absolute right-0 top-12 z-50 hidden w-[360px] rounded-lg border border-gray-200 bg-white text-[#1f2a2e] shadow-xl">
+
+        <div class="flex items-center justify-between border-b px-4 py-3">
+          <h2 class="font-semibold">Office Notifications</h2>
+
+          <span id="notification-total" class="text-xs text-gray-500">
+            Loading...
+          </span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 border-b p-3">
+
+          <div class="rounded bg-red-50 p-2 text-center">
+            <div id="notification-expired" class="text-xl font-bold text-red-700">0</div>
+            <div class="text-xs text-gray-600">Expired</div>
+          </div>
+
+          <div class="rounded bg-amber-50 p-2 text-center">
+            <div id="notification-soon" class="text-xl font-bold text-amber-700">0</div>
+            <div class="text-xs text-gray-600">Expiring soon</div>
+          </div>
+
+          <div class="rounded bg-blue-50 p-2 text-center">
+            <div id="notification-upcoming" class="text-xl font-bold text-blue-700">0</div>
+            <div class="text-xs text-gray-600">Upcoming</div>
+          </div>
+
+        </div>
+
+        <div id="notification-records" class="max-h-[300px] overflow-y-auto p-3">
+
+          <p class="text-sm text-gray-500">
+            Loading notifications...
+          </p>
+
+        </div>
+
+        <a href="{{ url_for('notifications.compliance') }}"
+          class="block border-t px-4 py-3 text-center text-sm font-semibold text-[#1e3f3d] hover:bg-gray-50">
+          View all notifications →
+        </a>
+
+      </div>
+    </div>
+
   </header>
 
   <nav class="flex flex-wrap gap-[2px] bg-[#1e3f3d] px-8">
-        <a class="inline-block border-b-[3px] border-transparent px-[18px] py-[10px] text-[13px] tracking-[0.03em] text-[#c9d6d4] no-underline transition-colors duration-150 hover:text-white {{ 'text-white border-[#b5772f]' if request.path.startswith('/employees') else '' }}" href="{{ url_for('employees.employees') }}">Employees</a>
-        {# <a class="inline-block border-b-[3px] border-transparent px-[18px] py-[10px] text-[13px] tracking-[0.03em] text-[#c9d6d4] no-underline transition-colors duration-150 hover:text-white {{ 'text-white border-[#b5772f]' if request.path == '/' else '' }}" href="{{ url_for('balance.balance') }}">Balance</a> #}
-        <a class="inline-block border-b-[3px] border-transparent px-[18px] py-[10px] text-[13px] tracking-[0.03em] text-[#c9d6d4] no-underline transition-colors duration-150 hover:text-white {{ 'text-white border-[#b5772f]' if request.path.startswith('/form') else '' }}" href="{{ url_for('form.form') }}">Form</a>
-        <a class="inline-block border-b-[3px] border-transparent px-[18px] py-[10px] text-[13px] tracking-[0.03em] text-[#c9d6d4] no-underline transition-colors duration-150 hover:text-white {{ 'text-white border-[#b5772f]' if request.path.startswith('/logs') else '' }}" href="{{ url_for('history.history') }}">History</a>
+    <a class="inline-block border-b-[3px] border-transparent px-[18px] py-[10px] text-[13px] tracking-[0.03em] text-[#c9d6d4] no-underline transition-colors duration-150 hover:text-white {{ 'text-white border-[#b5772f]' if request.path.startswith('/employees') else '' }}"
+      href="{{ url_for('employees.employees') }}">Employees</a>
+    {# <a
+      class="inline-block border-b-[3px] border-transparent px-[18px] py-[10px] text-[13px] tracking-[0.03em] text-[#c9d6d4] no-underline transition-colors duration-150 hover:text-white {{ 'text-white border-[#b5772f]' if request.path == '/' else '' }}"
+      href="{{ url_for('balance.balance') }}">Balance</a> #}
+    <a class="inline-block border-b-[3px] border-transparent px-[18px] py-[10px] text-[13px] tracking-[0.03em] text-[#c9d6d4] no-underline transition-colors duration-150 hover:text-white {{ 'text-white border-[#b5772f]' if request.path.startswith('/form') else '' }}"
+      href="{{ url_for('form.form') }}">Form</a>
+    <a class="inline-block border-b-[3px] border-transparent px-[18px] py-[10px] text-[13px] tracking-[0.03em] text-[#c9d6d4] no-underline transition-colors duration-150 hover:text-white {{ 'text-white border-[#b5772f]' if request.path.startswith('/logs') else '' }}"
+      href="{{ url_for('history.history') }}">History</a>
   </nav>
 
   <main class="mx-auto my-7 max-w-[1340px] px-6">
     {% block content %}{% endblock %}
   </main>
+  <script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+      const toggle = document.getElementById("notification-toggle");
+      const dropdown = document.getElementById("notification-dropdown");
+      const container = document.getElementById("notification-container");
+
+      const badge = document.getElementById("notification-badge");
+      const recordsContainer = document.getElementById("notification-records");
+
+      function closeDropdown() {
+        dropdown.classList.add("hidden");
+        toggle.setAttribute("aria-expanded", "false");
+      }
+
+      async function loadNotifications() {
+
+        recordsContainer.innerHTML = `
+            <p class="text-sm text-gray-500">Loading...</p>
+        `;
+
+        try {
+
+          const response = await fetch(
+            "{{ url_for('notifications.notification_summary') }}"
+          );
+
+          if (!response.ok) {
+            throw new Error("Could not load notifications");
+          }
+
+          const data = await response.json();
+
+          document.getElementById("notification-expired").textContent =
+            data.summary.expired;
+
+          document.getElementById("notification-soon").textContent =
+            data.summary.expiring_soon;
+
+          document.getElementById("notification-upcoming").textContent =
+            data.summary.upcoming;
+
+          document.getElementById("notification-total").textContent =
+            `${data.attention_count} requiring attention`;
+
+          if (data.attention_count > 0) {
+            badge.textContent = data.attention_count;
+            badge.classList.remove("hidden");
+          } else {
+            badge.classList.add("hidden");
+          }
+
+          if (data.records.length === 0) {
+
+            recordsContainer.innerHTML = `
+                    <p class="py-4 text-center text-sm text-gray-500">
+                        No upcoming or expired documents.
+                    </p>
+                `;
+
+            return;
+          }
+
+          recordsContainer.innerHTML = data.records.map(record => {
+
+            const statusLabels = {
+              expired: "Expired",
+              expiring_soon: "Expiring soon",
+              upcoming: "Upcoming"
+            };
+
+            const colors = {
+              expired: "bg-red-100 text-red-700",
+              expiring_soon: "bg-amber-100 text-amber-700",
+              upcoming: "bg-blue-100 text-blue-700"
+            };
+
+            const date = new Date(
+              record.expiration_date + "T00:00:00"
+            ).toLocaleDateString();
+
+            const remaining = record.days_remaining < 0
+              ? `${Math.abs(record.days_remaining)} days overdue`
+              : `${record.days_remaining} days remaining`;
+
+            return `
+                    <div class="border-b py-3 last:border-0">
+
+                        <div class="flex justify-between gap-2">
+
+                            <div>
+                                <p class="font-semibold text-sm">
+                                    ${escapeHTML(record.employee_name)}
+                                </p>
+
+                                <p class="text-xs text-gray-500">
+                                    ${escapeHTML(record.category)}
+                                </p>
+                            </div>
+
+                            <span class="h-fit rounded px-2 py-1 text-xs ${colors[record.status]}">
+                                ${statusLabels[record.status]}
+                            </span>
+
+                        </div>
+
+                        <div class="mt-1 flex justify-between text-xs text-gray-500">
+                            <span>Expires: ${date}</span>
+                            <span>${remaining}</span>
+                        </div>
+
+                    </div>
+                `;
+
+          }).join("");
+
+        } catch (error) {
+
+          recordsContainer.innerHTML = `
+                <p class="py-4 text-center text-sm text-red-600">
+                    Unable to load notifications.
+                </p>
+            `;
+
+          console.error(error);
+        }
+      }
+
+      function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, char => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        })[char]);
+      }
+
+      toggle.addEventListener("click", async () => {
+
+        const isOpen = !dropdown.classList.contains("hidden");
+
+        if (isOpen) {
+          closeDropdown();
+        } else {
+          dropdown.classList.remove("hidden");
+          toggle.setAttribute("aria-expanded", "true");
+
+          await loadNotifications();
+        }
+      });
+
+      document.addEventListener("click", event => {
+
+        if (!container.contains(event.target)) {
+          closeDropdown();
+        }
+      });
+
+      document.addEventListener("keydown", event => {
+
+        if (event.key === "Escape") {
+          closeDropdown();
+        }
+      });
+
+    });
+
+  </script>
 </body>
+
+
 </html>

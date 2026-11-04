@@ -228,8 +228,8 @@ def get_used_hours(employee, leave_type_name, as_of_date=None):
             Log.employee_id == employee.id,
             Log.action == "USED",
             LeaveType.name == leave_type_name,
-            Log.start_date <= as_of_date,
         )
         .scalar()
     )
+
     return Decimal(total or 0)

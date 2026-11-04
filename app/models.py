@@ -1,6 +1,4 @@
 from .extensions import db
-from sqlalchemy import Numeric
-
 
 class Employee(db.Model):
     __tablename__ = "employees"
@@ -62,7 +60,13 @@ class Employee(db.Model):
         "EmploymentPeriod",
         back_populates="employee",
         cascade="all, delete-orphan",
-        order_by="EmploymentPeriod.start_date"
+        order_by="EmploymentPeriod.start_date",
+    )
+
+    bribery_certifications = db.relationship(
+        "BriberyCertification",
+        back_populates="employee",
+        cascade="all, delete-orphan"
     )
 
 class LeaveType(db.Model):
@@ -212,4 +216,82 @@ class EmploymentPeriod(db.Model):
     employee = db.relationship(
         "Employee",
         back_populates="employment_periods"
+    )
+
+class BriberyCertificationCycle(db.Model):
+    __tablename__ = "bribery_certification_cycles"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    year = db.Column(
+        db.Integer,
+        unique=True,
+        nullable=False
+    )
+
+    scheduled_date = db.Column(db.Date)
+
+    notes = db.Column(db.Text)
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.current_timestamp()
+    )
+
+
+class BriberyCertification(db.Model):
+    __tablename__ = "bribery_certifications"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    employee_id = db.Column(
+        db.Integer,
+        db.ForeignKey("employees.id"),
+        nullable=False
+    )
+
+    certification_type = db.Column(
+        db.String(50),
+        nullable=False
+    )
+    # ONBOARDING or ANNUAL
+
+    certification_year = db.Column(db.Integer)
+
+    completed_date = db.Column(
+        db.Date,
+        nullable=False
+    )
+
+    notes = db.Column(db.Text)
+
+    employee = db.relationship(
+        "Employee",
+        back_populates="bribery_certifications"
+    )
+
+
+class CompanyInsurancePolicy(db.Model):
+    __tablename__ = "company_insurance_policies"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    policy_name = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    policy_number = db.Column(db.String(100))
+
+    expiration_date = db.Column(
+        db.Date,
+        nullable=False
+    )
+
+    notes = db.Column(db.Text)
+
+    updated_at = db.Column(
+        db.DateTime,
+        server_default=db.func.current_timestamp(),
+        onupdate=db.func.current_timestamp()
     )
