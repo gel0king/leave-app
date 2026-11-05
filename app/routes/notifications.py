@@ -16,7 +16,8 @@ from app.utils.bribery import (
     complete_onboarding_certification
 )
 
-from app.models import Employee, BriberyCertification, BriberyCertificationCycle
+from app.models import Employee, BriberyCertification, BriberyCertificationCycle, CompanyInsurancePolicy
+from app.extensions import db
 
 
 notifications_bp = Blueprint("notifications", __name__)
@@ -341,3 +342,220 @@ def record_onboarding_certification():
             "message": str(error)
         }), 400
 
+
+@notifications_bp.route("/insurance")
+def company_insurance():
+
+    policies = CompanyInsurancePolicy.query.order_by(
+        CompanyInsurancePolicy.expiration_date.asc()
+    ).all()
+
+    today = date.today()
+
+    for policy in policies:
+        policy.days_remaining = (
+            policy.expiration_date - today
+        ).days
+
+        if policy.days_remaining < 0:
+            policy.status = "expired"
+        elif policy.days_remaining <= 30:
+            policy.status = "expiring_soon"
+        elif policy.days_remaining <= 90:
+            policy.status = "upcoming"
+        else:
+            policy.status = "current"
+
+    return render_template(
+        "company_insurance.html",
+        policies=policies
+    )
+
+
+@notifications_bp.route("/insurance/create", methods=["POST"])
+def create_company_insurance():
+
+    policy_name = request.form.get("policy_name", "").strip()
+    policy_number = request.form.get("policy_number", "").strip()
+    expiration_date_string = request.form.get("expiration_date")
+    notes = request.form.get("notes", "").strip()
+
+    if not policy_name or not expiration_date_string:
+        return jsonify({
+            "success": False,
+            "message": "Policy name and expiration date are required."
+        }), 400
+
+    try:
+        expiration_date = date.fromisoformat(
+            expiration_date_string
+        )
+    except ValueError:
+        return jsonify({
+            "success": False,
+            "message": "Invalid expiration date."
+        }), 400
+
+    policy = CompanyInsurancePolicy(
+        policy_name=policy_name,
+        policy_number=policy_number or None,
+        expiration_date=expiration_date,
+        notes=notes or None
+    )
+
+    db.session.add(policy)
+    db.session.flush()
+
+    return jsonify({
+        "success": True,
+        "message": "Company insurance policy created."
+    })
+
+
+@notifications_bp.route("/insurance/<int:policy_id>/update",methods=["POST"])
+def update_company_insurance(policy_id):
+    policy = db.session.get(
+        CompanyInsurancePolicy,
+        policy_id
+    )
+
+    if not policy:
+        return jsonify({
+            "success": False,
+            "message": "Policy not found."
+        }), 404
+
+    policy_name = request.form.get("policy_name", "").strip()
+    policy_number = request.form.get("policy_number", "").strip()
+    expiration_date_string = request.form.get("expiration_date")
+    notes = request.form.get("notes", "").strip()
+
+    if not policy_name or not expiration_date_string:
+        return jsonify({
+            "success": False,
+            "message": "Policy name and expiration date are required."
+        }), 400
+
+    try:
+        expiration_date = date.fromisoformat(
+            expiration_date_string
+        )
+    except ValueError:
+        return jsonify({
+            "success": False,
+            "message": "Invalid expiration date."
+        }), 400
+
+    old_values = {
+        "Policy Name": policy.policy_name,
+        "Policy Number": policy.policy_number,
+        "Expiration Date": (
+            policy.expiration_date.strftime("%m/%d/%Y")
+        )
+    }
+
+    new_values = {
+        "Policy Name": policy_name,
+        "Policy Number": policy_number or None,
+        "Expiration Date": expiration_date.strftime("%m/%d/%Y")
+    }
+
+    policy.policy_name = policy_name
+    policy.policy_number = policy_number or None
+    policy.expiration_date = expiration_date
+    policy.notes = notes or None
+
+    db.session.add(policy)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Company insurance policy updated."
+    })
+
+@notifications_bp.route("/insurance/add", methods=["POST"])
+def add_company_insurance():
+
+    policy_name = request.form.get("policy_name", "").strip()
+    policy_number = request.form.get("policy_number", "").strip()
+    expiration_date_string = request.form.get("expiration_date")
+    notes = request.form.get("notes", "").strip()
+
+    if not policy_name or not expiration_date_string:
+        return jsonify({
+            "success": False,
+            "message": "Policy name and expiration date are required."
+        }), 400
+
+    try:
+        expiration_date = date.fromisoformat(expiration_date_string)
+
+    except ValueError:
+        return jsonify({
+            "success": False,
+            "message": "Invalid expiration date."
+        }), 400
+
+    policy = CompanyInsurancePolicy(
+        policy_name=policy_name,
+        policy_number=policy_number or None,
+        expiration_date=expiration_date,
+        notes=notes or None
+    )
+
+    db.session.add(policy)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Company insurance policy added successfully."
+    })
+
+@notifications_bp.route("/insurance/<int:policy_id>/edit", methods=["POST"])
+def edit_company_insurance(policy_id):
+
+    policy = db.session.get(
+        CompanyInsurancePolicy,
+        policy_id
+    )
+
+    if not policy:
+        return jsonify({
+            "success": False,
+            "message": "Insurance policy not found."
+        }), 404
+
+    policy_name = request.form.get("policy_name", "").strip()
+    expiration_date_string = request.form.get("expiration_date")
+
+    if not policy_name or not expiration_date_string:
+        return jsonify({
+            "success": False,
+            "message": "Policy name and expiration date are required."
+        }), 400
+
+    try:
+        policy.expiration_date = date.fromisoformat(
+            expiration_date_string
+        )
+    except ValueError:
+        return jsonify({
+            "success": False,
+            "message": "Invalid expiration date."
+        }), 400
+
+    policy.policy_name = policy_name
+    policy.policy_number = (
+        request.form.get("policy_number", "").strip() or None
+    )
+    policy.notes = (
+        request.form.get("notes", "").strip() or None
+    )
+
+    db.session.add(policy)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Insurance policy updated successfully."
+    })
