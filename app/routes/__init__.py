@@ -9,7 +9,5 @@ def register_routes(app):
     app.register_blueprint(employees_bp)
     app.register_blueprint(history_bp)
     app.register_blueprint(form_bp)
-    app.register_blueprint(
-        notifications_bp,
-        url_prefix="/notifications"
-    )
+    app.register_blueprint(notifications_bp, url_prefix="/notifications")
+    

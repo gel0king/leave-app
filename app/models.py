@@ -251,6 +251,14 @@ class BriberyCertificationCycle(db.Model):
 class BriberyCertification(db.Model):
     __tablename__ = "bribery_certifications"
 
+    __table_args__ = (
+        db.UniqueConstraint(
+            "employee_id",
+            "cycle_id",
+            name="uq_employee_bribery_cycle"
+        ),
+    )
+
     id = db.Column(db.Integer, primary_key=True)
 
     employee_id = db.Column(
@@ -271,7 +279,6 @@ class BriberyCertification(db.Model):
         db.String(50),
         nullable=False
     )
-    # ONBOARDING or ANNUAL
 
     certification_year = db.Column(
         db.Integer,
@@ -283,11 +290,10 @@ class BriberyCertification(db.Model):
         db.String(50),
         nullable=True
     )
-    # GROUP or INDIVIDUAL
 
     completed_date = db.Column(
         db.Date,
-        nullable=False
+        nullable=True
     )
 
     notes = db.Column(db.Text)
