@@ -1,28 +1,87 @@
+
 {% extends "base.html" %}
+
+{% block title %}Add New Employee | Leave Management{% endblock %}
 
 {% block content %}
 
-<div class="rounded-[3px] border border-[#d9d3c4] bg-white px-[22px] py-5 shadow-sm">
-    <h2
-        class="mb-4 border-b border-[#d9d3c4] pb-2.5 text-[13px] font-semibold uppercase tracking-[0.06em] text-[#6b7275]">
-        Add New Employee
-    </h2>
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
-    <p class="-mt-1 mb-5 text-[12.5px] italic text-[#6b7275]">
-        Enter the employee's basic information, employment details,
-        identification, and contact information.
-    </p>
+    <!-- Page Header -->
+    <div class="flex flex-col gap-4 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
 
-    {% set form_action = url_for('employees.add_employee_submit') %}
-    {% set submit_text = 'Add Employee' %}
+        <div class="flex items-center gap-3">
 
-    {% set ssn = '' %}
-    {% set date_of_birth = '' %}
-    {% set license_number = '' %}
-    {% set other_id_number = '' %}
-    {% set address = '' %}
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e8f3ef] text-[#173f3a]">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    width="22" height="22" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <line x1="19" y1="8" x2="19" y2="14"/>
+                    <line x1="22" y1="11" x2="16" y2="11"/>
+                </svg>
+            </div>
 
-    {% include "_employee_form.html" %}
+            <div>
+                <h2 class="text-lg font-bold tracking-tight text-slate-800">
+                    Add New Employee
+                </h2>
+
+                <p class="mt-0.5 text-xs text-slate-500">
+                    Create a new employee record
+                </p>
+            </div>
+
+        </div>
+
+        <a href="{{ url_for('employees.employees') }}"
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                width="17" height="17" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6"/>
+                <path d="M20 12H9"/>
+            </svg>
+
+            Back to Employees
+
+        </a>
+
+    </div>
+
+    <!-- Form Introduction -->
+    <div class="border-b border-slate-100 bg-slate-50/60 px-6 py-4 sm:px-7">
+
+        <p class="text-sm leading-relaxed text-slate-600">
+            Enter the employee's basic information, employment details,
+            identification, and contact information.
+        </p>
+
+        <p class="mt-1 text-xs text-slate-400">
+            Fields marked as required must be completed.
+        </p>
+
+    </div>
+
+    <!-- Employee Form -->
+    <div class="px-6 py-6 sm:px-7">
+
+        {% set form_action = url_for('employees.add_employee_submit') %}
+        {% set submit_text = 'Add Employee' %}
+
+        {% set ssn = '' %}
+        {% set date_of_birth = '' %}
+        {% set license_number = '' %}
+        {% set other_id_number = '' %}
+        {% set address = '' %}
+
+        {% include "_employee_form.html" %}
+
+    </div>
 
 </div>
 

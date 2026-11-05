@@ -1,4 +1,5 @@
-from datetime import date, timedelta
+
+from datetime import date
 
 from app.extensions import db
 from app.models import (
@@ -12,18 +13,14 @@ def get_expiration_status(expiration_date, today=None):
     if expiration_date is None:
         return "unknown"
 
-    if today is None:
-        today = date.today()
-
+    today = today or date.today()
     days_remaining = (expiration_date - today).days
 
     if days_remaining < 0:
         return "expired"
-
-    if days_remaining <= 30:
+    elif days_remaining <= 30:
         return "expiring_soon"
-
-    if days_remaining <= 90:
+    elif days_remaining <= 90:
         return "upcoming"
 
     return "current"
@@ -33,27 +30,31 @@ def get_days_remaining(expiration_date, today=None):
     if expiration_date is None:
         return None
 
-    if today is None:
-        today = date.today()
-
+    today = today or date.today()
     return (expiration_date - today).days
 
 
+
 def get_active_employees():
-    latest_period_id = (
-        db.session.query(db.func.max(EmploymentPeriod.id))
-        .filter(
-            EmploymentPeriod.employee_id == Employee.id
+
+    latest_period = (
+        db.session.query(
+            EmploymentPeriod.employee_id,
+            db.func.max(EmploymentPeriod.id).label("latest_id")
         )
-        .correlate(Employee)
-        .scalar_subquery()
+        .group_by(EmploymentPeriod.employee_id)
+        .subquery()
     )
 
     employees = (
         db.session.query(Employee, EmploymentPeriod)
         .join(
+            latest_period,
+            latest_period.c.employee_id == Employee.id
+        )
+        .join(
             EmploymentPeriod,
-            EmploymentPeriod.id == latest_period_id
+            EmploymentPeriod.id == latest_period.c.latest_id
         )
         .filter(
             EmploymentPeriod.employment_status != "Inactive"
@@ -65,25 +66,16 @@ def get_active_employees():
     return employees
 
 
-def get_employee_document_expirations(today=None):
-    if today is None:
-        today = date.today()
 
+def get_employee_document_expirations(today=None):
+    today = today or date.today()
     records = []
 
-    employees = get_active_employees()
-
-    for employee, period in employees:
+    for employee, period in get_active_employees():
 
         documents = [
-            (
-                "Driver's License",
-                employee.driver_license_expire_date
-            ),
-            (
-                "Vehicle Insurance",
-                employee.insurance_expires
-            ),
+            ("Driver's License", employee.driver_license_expire_date),
+            ("Vehicle Insurance", employee.insurance_expires),
         ]
 
         for document_type, expiration_date in documents:
@@ -109,20 +101,20 @@ def get_employee_document_expirations(today=None):
 
 
 def get_company_insurance_expirations(today=None):
-    if today is None:
-        today = date.today()
-
+    today = today or date.today()
     records = []
 
-    policies = CompanyInsurancePolicy.query.all()
+    policies = CompanyInsurancePolicy.query.order_by(
+        CompanyInsurancePolicy.expiration_date
+    ).all()
 
     for policy in policies:
 
         records.append({
             "policy_id": policy.id,
             "employee_id": None,
-            "employee_name": "Company-wide",
-            "office": None,
+            "employee_name": policy.policy_name,
+            "office": "Company",
             "category": "Company Insurance Policy",
             "expiration_date": policy.expiration_date,
             "days_remaining": get_days_remaining(
@@ -162,6 +154,10 @@ def get_all_document_expirations(today=None):
 
     records.extend(
         get_company_insurance_expirations(today)
+    )
+
+    records.sort(
+        key=lambda r: r["expiration_date"]
     )
 
     return records

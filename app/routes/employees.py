@@ -380,14 +380,10 @@ def edit_employee(emp_id):
         or sick_leave != Decimal(old_sick)
     )
 
-    if annual_leave == 0 and sick_leave == 0:
-        leave_balance_date = None
-    elif balances_changed:
-        leave_balance_date = parse_date(
-            request.form.get("leave_balance_date")
-        ) or date.today()
+    if balances_changed:
+        leave_balance_date = date.today()
     else:
-        leave_balance_date = employment_period.leave_balance_date if employment_period else None
+        leave_balance_date = employment_period.leave_balance_date
 
     if annual_leave is None or sick_leave is None:
         flash("Leave balances must be 0 or in 0.5 hour increments.", "error")

@@ -218,6 +218,7 @@ class EmploymentPeriod(db.Model):
         back_populates="employment_periods"
     )
 
+
 class BriberyCertificationCycle(db.Model):
     __tablename__ = "bribery_certification_cycles"
 
@@ -238,6 +239,14 @@ class BriberyCertificationCycle(db.Model):
         server_default=db.func.current_timestamp()
     )
 
+    certifications = db.relationship(
+        "BriberyCertification",
+        back_populates="cycle",
+        cascade="all, delete-orphan"
+    )
+
+
+
 
 class BriberyCertification(db.Model):
     __tablename__ = "bribery_certifications"
@@ -247,7 +256,15 @@ class BriberyCertification(db.Model):
     employee_id = db.Column(
         db.Integer,
         db.ForeignKey("employees.id"),
-        nullable=False
+        nullable=False,
+        index=True
+    )
+
+    cycle_id = db.Column(
+        db.Integer,
+        db.ForeignKey("bribery_certification_cycles.id"),
+        nullable=True,
+        index=True
     )
 
     certification_type = db.Column(
@@ -256,7 +273,17 @@ class BriberyCertification(db.Model):
     )
     # ONBOARDING or ANNUAL
 
-    certification_year = db.Column(db.Integer)
+    certification_year = db.Column(
+        db.Integer,
+        nullable=True,
+        index=True
+    )
+
+    completion_method = db.Column(
+        db.String(50),
+        nullable=True
+    )
+    # GROUP or INDIVIDUAL
 
     completed_date = db.Column(
         db.Date,
@@ -269,6 +296,12 @@ class BriberyCertification(db.Model):
         "Employee",
         back_populates="bribery_certifications"
     )
+
+    cycle = db.relationship(
+        "BriberyCertificationCycle",
+        back_populates="certifications"
+    )
+
 
 
 class CompanyInsurancePolicy(db.Model):

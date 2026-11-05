@@ -1,3 +1,4 @@
+
 from datetime import datetime, time
 
 from flask import Blueprint, render_template, request
@@ -11,6 +12,7 @@ history_bp = Blueprint("history", __name__)
 
 @history_bp.route("/history")
 def history():
+
     order = request.args.get("order", "DESC").upper()
 
     if order not in ("ASC", "DESC"):
@@ -24,7 +26,6 @@ def history():
         )
     )
 
-    # Date filters
     start_date_str = request.args.get("start_date", "")
     end_date_str = request.args.get("end_date", "")
 
@@ -65,7 +66,6 @@ def history():
             )
         )
 
-    # Sorting
     if order == "ASC":
         query = query.order_by(Log.time_created.asc())
     else:
@@ -73,10 +73,61 @@ def history():
 
     events = query.all()
 
-    # Parse changes for jinja
     for event in events:
-        event.old_values_display = parse_log_values(event.old_values)
-        event.new_values_display = parse_log_values(event.new_values)
+
+        old_values = parse_log_values(event.old_values)
+        new_values = parse_log_values(event.new_values)
+
+        event.old_values_display = old_values
+        event.new_values_display = new_values
+
+        changes = []
+
+        fields = list(dict.fromkeys(
+            list(old_values.keys()) +
+            list(new_values.keys())
+        ))
+
+        for field in fields:
+
+            old_value = old_values.get(field)
+            new_value = new_values.get(field)
+
+            if old_value != new_value:
+
+                changes.append({
+                    "field": field,
+                    "old": old_value,
+                    "new": new_value
+                })
+
+        leave_details = [
+            ("leave_type", "Leave Type",
+             event.leave_type.name if event.leave_type else None),
+
+            ("start_date", "Start Date",
+             event.start_date.strftime("%m/%d/%Y")
+             if event.start_date else None),
+
+            ("end_date", "End Date",
+             event.end_date.strftime("%m/%d/%Y")
+             if event.end_date else None),
+
+            ("hours", "Hours",
+             event.hours if event.hours is not None else None),
+        ]
+
+        for field, label, value in leave_details:
+
+            if value is not None:
+
+                changes.append({
+                    "field": label,
+                    "old": "—",
+                    "new": value
+                })
+
+        event.changes_display = changes
 
     return render_template(
         "history.html",

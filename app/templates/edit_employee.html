@@ -1,24 +1,105 @@
+
 {% extends "base.html" %}
 
 {% block content %}
 
-<div class="rounded-[3px] border border-[#d9d3c4] bg-white px-[22px] py-5 shadow-sm">
-<div class="flex items-center justify-between mb-4">
-    <div>
-        <h2 class="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#6b7275]">
-            Edit Employee
-        </h2>
+<div class="space-y-6">
 
-        <p class="mt-1 text-[12.5px] italic text-[#6b7275]">
-            Update the employee's information below.
-        </p>
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+        <div>
+            <div class="flex items-center gap-2 text-xs text-slate-500 mb-2">
+                <a href="{{ url_for('employees.employees') }}"
+                   class="hover:text-[#173f3a]">
+                    Employees
+                </a>
+
+                <span>/</span>
+
+                <span class="text-slate-700 font-medium">
+                    Edit Employee
+                </span>
+            </div>
+
+            <h1 class="text-2xl font-bold tracking-tight text-slate-800">
+                Edit Employee
+            </h1>
+
+            <p class="mt-1 text-sm text-slate-500">
+                Update employee information and employment details.
+            </p>
+        </div>
+
+        <a href="{{ url_for('employees.employees') }}"
+           class="inline-flex items-center justify-center gap-2 px-4 py-2.5
+                  rounded-lg border border-slate-200 bg-white
+                  text-sm font-semibold text-slate-600
+                  hover:bg-slate-50">
+
+            <span>&larr;</span>
+            Back to Employees
+
+        </a>
+
     </div>
-</div>
 
-{% set form_action = url_for('employees.edit_employee', emp_id=employee.id) %}
-{% set submit_text = 'Save Changes' %}
 
-{% include "_employee_form.html" %}
+    <!-- Employee Information Summary -->
+    <div class="flex flex-col sm:flex-row sm:items-center
+                justify-between gap-3 rounded-xl border
+                border-slate-200 bg-white px-5 py-4 shadow-sm">
+
+        <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Currently editing
+            </p>
+
+            <h2 class="mt-1 text-lg font-bold text-slate-800">
+                {{ employee.name }}
+            </h2>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-medium text-slate-500">
+                Employee Number
+            </span>
+
+            <span class="rounded-md bg-slate-100 px-3 py-1.5
+                         text-sm font-semibold text-slate-700">
+                {{ employee.employee_number }}
+            </span>
+        </div>
+
+    </div>
+
+
+    <!-- Employee Form -->
+    <div class="rounded-xl border border-slate-200
+                bg-white shadow-sm overflow-hidden">
+
+        <div class="border-b border-slate-200 px-5 py-4 sm:px-7">
+
+            <h2 class="text-sm font-bold text-slate-800">
+                Employee Information
+            </h2>
+
+            <p class="mt-1 text-xs text-slate-500">
+                Make the necessary changes below and save when finished.
+            </p>
+
+        </div>
+
+        <div class="px-5 py-6 sm:px-7">
+
+            {% set form_action = url_for('employees.edit_employee', emp_id=employee.id) %}
+            {% set submit_text = 'Save Changes' %}
+
+            {% include "_employee_form.html" %}
+
+        </div>
+
+    </div>
 
 </div>
 

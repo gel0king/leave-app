@@ -1,89 +1,184 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="rounded-[3px] border border-[#d9d3c4] bg-white px-[22px] py-5 shadow-sm">
-    <h2 class="mb-4 border-b border-[#d9d3c4] pb-2.5 text-[13px] font-semibold uppercase tracking-[0.06em] text-[#6b7275]">
-        Leave Request
-    </h2>
-    <form method="post" action="{{ url_for('form.form_submit') }}">
-        <fieldset class="mb-6">
-            <legend class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]">
-                Request Details
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+
+    <!-- Page Header -->
+    <div class="border-b border-slate-200 px-6 py-5 sm:px-7">
+        <div class="flex items-center gap-3">
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-[#173f3a] text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="5" width="18" height="16" rx="2" />
+                    <path d="M16 3v4M8 3v4M3 11h18" />
+                    <path d="m9 16 2 2 4-4" />
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-lg font-bold tracking-tight text-slate-800">
+                    Leave Request
+                </h2>
+                <p class="mt-0.5 text-xs text-slate-500">
+                    Submit a new employee leave request
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" action="{{ url_for('form.form_submit') }}" class="p-6 sm:p-7">
+
+        <!-- Request Details -->
+        <fieldset class="mb-8">
+            <legend class="mb-5 flex w-full items-center gap-2 border-b border-slate-200 pb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M5 21a7 7 0 0 1 14 0" />
+                </svg>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Request Details
+                </span>
             </legend>
-            <div class="flex flex-wrap items-end gap-3">
-                <div class="flex min-w-[220px] flex-1 flex-col gap-1">
-                    <label for="employee_id" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">Employee</label>
+
+            <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+
+                <div class="flex flex-col gap-2">
+                    <label for="employee_id" class="text-xs font-semibold text-slate-600">
+                        Employee <span class="text-red-500">*</span>
+                    </label>
                     <select id="employee_id" name="employee_id" required
-                        class="rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1">
+                        class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 transition focus:border-[#27836f] focus:outline-none focus:ring-2 focus:ring-[#27836f]/15">
                         <option value="" disabled selected>Select an employee</option>
                         {% for e in employees %}
                         <option value="{{ e.id }}">{{ e.name }} (#{{ e.employee_number }})</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="flex min-w-[220px] flex-1 flex-col gap-1">
-                    <label for="leave_type" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">Leave Type</label>
+
+                <div class="flex flex-col gap-2">
+                    <label for="leave_type" class="text-xs font-semibold text-slate-600">
+                        Leave Type <span class="text-red-500">*</span>
+                    </label>
                     <select id="leave_type" name="leave_type" required
                         onchange="document.getElementById('other-specify-wrap').classList.toggle('hidden', this.value !== 'Other')"
-                        class="rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1">
+                        class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 transition focus:border-[#27836f] focus:outline-none focus:ring-2 focus:ring-[#27836f]/15">
                         <option value="" disabled selected>Select a leave type</option>
                         {% for lt in leave_types %}
                         <option value="{{ lt }}">{{ lt }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div id="other-specify-wrap" class="hidden flex min-w-[220px] flex-1 flex-col gap-1">
-                    <label for="leave_other_specify" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">Specify Other</label>
+
+                <div id="other-specify-wrap" class="hidden flex flex-col gap-2">
+                    <label for="leave_other_specify" class="text-xs font-semibold text-slate-600">
+                        Specify Other
+                    </label>
                     <input id="leave_other_specify" type="text" name="leave_other_specify"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
+                        class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 transition focus:border-[#27836f] focus:outline-none focus:ring-2 focus:ring-[#27836f]/15" />
                 </div>
+
             </div>
         </fieldset>
-        <fieldset class="mb-6">
-            <legend class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]">
-                Dates &amp; Hours
+
+        <!-- Dates & Hours -->
+        <fieldset class="mb-8">
+            <legend class="mb-5 flex w-full items-center gap-2 border-b border-slate-200 pb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                </svg>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Dates &amp; Hours
+                </span>
             </legend>
-            <div class="flex flex-wrap items-end gap-3">
-                <div class="flex w-[155px] flex-col gap-1">
-                    <label for="from_date" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">From Date</label>
+
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+
+                <div class="flex flex-col gap-2">
+                    <label for="from_date" class="text-xs font-semibold text-slate-600">
+                        From Date <span class="text-red-500">*</span>
+                    </label>
                     <input id="from_date" type="date" name="from_date" required
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
+                        class="w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 transition focus:border-[#27836f] focus:outline-none focus:ring-2 focus:ring-[#27836f]/15" />
                 </div>
-                <div class="flex w-[130px] flex-col gap-1">
-                    <label for="from_time" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">From Time</label>
+
+                <div class="flex flex-col gap-2">
+                    <label for="from_time" class="text-xs font-semibold text-slate-600">
+                        From Time
+                    </label>
                     <input id="from_time" type="time" name="from_time"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
+                        class="w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 transition focus:border-[#27836f] focus:outline-none focus:ring-2 focus:ring-[#27836f]/15" />
                 </div>
-                <div class="flex w-[155px] flex-col gap-1">
-                    <label for="to_date" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">To Date</label>
+
+                <div class="flex flex-col gap-2">
+                    <label for="to_date" class="text-xs font-semibold text-slate-600">
+                        To Date
+                    </label>
                     <input id="to_date" type="date" name="to_date"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
+                        class="w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 transition focus:border-[#27836f] focus:outline-none focus:ring-2 focus:ring-[#27836f]/15" />
                 </div>
-                <div class="flex w-[130px] flex-col gap-1">
-                    <label for="to_time" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">To Time</label>
+
+                <div class="flex flex-col gap-2">
+                    <label for="to_time" class="text-xs font-semibold text-slate-600">
+                        To Time
+                    </label>
                     <input id="to_time" type="time" name="to_time"
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
+                        class="w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 transition focus:border-[#27836f] focus:outline-none focus:ring-2 focus:ring-[#27836f]/15" />
                 </div>
-                <div class="flex w-[130px] flex-col gap-1">
-                    <label for="total_hours" class="text-[11px] uppercase tracking-[0.04em] text-[#6b7275]">Total Hours</label>
+
+                <div class="flex flex-col gap-2">
+                    <label for="total_hours" class="text-xs font-semibold text-slate-600">
+                        Total Hours <span class="text-red-500">*</span>
+                    </label>
                     <input id="total_hours" type="number" step="0.5" min="0.5" name="total_hours" required
-                        class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1" />
+                        class="w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 transition focus:border-[#27836f] focus:outline-none focus:ring-2 focus:ring-[#27836f]/15" />
                 </div>
+
             </div>
         </fieldset>
-        <fieldset class="mb-6">
-            <legend class="mb-3 border-b border-[#d9d3c4] pb-2 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6b7275]">
-                Comments
+
+        <!-- Comments -->
+        <fieldset class="mb-8">
+            <legend class="mb-5 flex w-full items-center gap-2 border-b border-slate-200 pb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                        d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z" />
+                </svg>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Comments
+                </span>
+                <span class="ml-1 text-[10px] font-normal normal-case text-slate-400">
+                    (Optional)
+                </span>
             </legend>
-            <textarea name="comments" rows="3"
-                class="w-full rounded-[3px] border border-[#d9d3c4] bg-white px-2.5 py-2 text-[13px] text-[#1f2a2e] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1"></textarea>
+
+            <textarea name="comments" rows="4"
+                placeholder="Enter any additional information about this leave request..."
+                class="w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 transition placeholder:text-slate-400 focus:border-[#27836f] focus:outline-none focus:ring-2 focus:ring-[#27836f]/15"></textarea>
         </fieldset>
-        <div class="flex items-center gap-3 border-t border-[#d9d3c4] pt-5">
+
+        <!-- Actions -->
+        <div
+            class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+
+            <p class="text-xs text-slate-400">
+                <span class="text-red-500">*</span> Required fields
+            </p>
+
             <button type="submit"
-                class="rounded-[3px] border-0 bg-[#2f5d5a] px-[18px] py-[9px] text-[13px] font-semibold tracking-[0.02em] text-white transition-colors hover:bg-[#1e3f3d] focus:outline-none focus:ring-2 focus:ring-[#2f5d5a] focus:ring-offset-1">
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#173f3a] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#22574f] focus:outline-none focus:ring-2 focus:ring-[#27836f]/40 focus:ring-offset-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m22 2-7 20-4-9-9-4Z" />
+                    <path d="M22 2 11 13" />
+                </svg>
                 Submit Request
             </button>
+
         </div>
+
     </form>
 </div>
 
