@@ -1,110 +1,318 @@
+
 {% extends "base.html" %}
 {% block content %}
 
-<div class="rounded-[3px] border border-[#d9d3c4] bg-white px-[22px] py-5 shadow-sm">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-semibold text-[#1e3f3d] m-0">Inactive Employees</h2>
-        <a href="{{ url_for('employees.employees') }}"
-            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors no-underline">
-            Back to Employees
-        </a>
-    </div>
-    <div class="mb-4">
-        <input type="text" id="search-filter" placeholder="Search by employee name or employee number..."
-            class="w-full  px-3 py-2 border border-[#d9d3c4] rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#2f5d5a]">
-    </div>
-    {% if rows %}
-    <div class="overflow-x-auto">
-        <table class="w-full border-collapse">
-            <thead>
-                <tr class="bg-white">
-                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Employee
-                        #</th>
-                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Name</th>
-                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Dept</th>
-                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]">Status
-                    </th>
-                    <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-[#d9d3c4]"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for e, p in rows %}
-                <tr class="hover:bg-gray-50 transition-colors permanent-delete-row" data-employee="{{ e.name.lower() }}"
-                    data-employee-number="{{ e.employee_number }}">
-                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ e.employee_number or "" }}</td>
-                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ e.name }}</td>
-                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ e.office or "" }}</td>
-                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">{{ p.employment_status or "" }}</td>
-                    <td class="px-4 py-3 text-sm border-b border-[#d9d3c4]">
-                        <div class="flex gap-3 items-center">
-                            <a href="{{ url_for('employees.edit_employee', emp_id=e.id, restore=1) }}"
-                                title="Restore employee"
-                                class="px-3 py-2 rounded-md bg-green-50 text-green-700 hover:bg-green-100 transition-colors no-underline text-xs font-medium">
-                                Restore
-                            </a>
-                            <form method="post"
-                                action="{{ url_for('employees.permanently_delete_employee', emp_id=e.id) }}"
-                                class="permanent-delete-form" data-employee-name="{{ e.name }}">
-                                <button type="button"
-                                    class="delete-button inline-flex items-center justify-center w-8 h-8 rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors border-none cursor-pointer"
-                                    title="Permanently delete employee" aria-label="Permanently delete {{ e.name }}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round">
-                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                        <path
-                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                        </path>
-                                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <p class="text-gray-500 italic">
-        No inactive employees.
-    </p>
-    {% endif %}
-</div>
-<div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
-    <div id="delete-modal-backdrop" class="absolute inset-0 bg-black/40"></div>
-    <div class="relative z-10 w-full max-w-md mx-4 rounded-lg bg-white shadow-xl border border-[#d9d3c4]">
-        <div class="px-6 py-5">
-            <h3 class="text-lg font-semibold text-[#1e3f3d] m-0">Delete Employee</h3>
-        </div>
-        <div class="px-6 py-5">
-            <p class="text-sm text-gray-700">
-                Are you sure you want to permanently delete
-                <span id="delete-employee-name" class="font-semibold text-[#1e3f3d]"></span>?
-            </p>
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
-            <p class="text-xs text-red-600 mt-3">
-                This action cannot be undone. The employee and their records will be permanently deleted.
-            </p>
-        </div>
-        <div class="px-6 py-4 bg-gray-50 rounded-b-lg">
-            <div class="flex justify-end gap-3">
-                <button type="button" id="delete-cancel"
-                    class="px-4 py-2 rounded-md bg-white border border-[#d9d3c4] text-gray-700 text-sm font-medium hover:bg-gray-100">
-                    Cancel
-                </button>
-                <button type="button" id="delete-confirm"
-                    class="px-4 py-2 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-700">
-                    Permanently Delete Employee
-                </button>
+    <!-- Header -->
+    <div class="flex flex-col gap-4 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+
+        <div class="flex items-center gap-3">
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+            </div>
+
+            <div>
+                <h2 class="text-lg font-bold tracking-tight text-slate-800">
+                    Inactive Employees
+                </h2>
+                <p class="mt-0.5 text-xs text-slate-500">
+                    View, restore, or permanently remove inactive employee records
+                </p>
             </div>
         </div>
+
+        <a href="{{ url_for('employees.employees') }}"
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6" />
+                <path d="M20 12H9" />
+            </svg>
+
+            Back to Employees
+        </a>
+
+    </div>
+
+    <div class="p-6 sm:p-7">
+
+        <!-- Search -->
+        <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+            <div class="relative w-full sm:max-w-md">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    width="18" height="18" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                </svg>
+
+                <input type="text" id="search-filter"
+                    placeholder="Search by employee name or number..."
+                    class="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#27836f] focus:outline-none focus:ring-2 focus:ring-[#27836f]/15">
+            </div>
+
+            {% if rows %}
+            <span class="text-xs font-medium text-slate-500">
+                {{ rows|length }} inactive employee{{ 's' if rows|length != 1 else '' }}
+            </span>
+            {% endif %}
+
+        </div>
+
+        {% if rows %}
+
+        <!-- Employee Table -->
+        <div class="overflow-x-auto rounded-lg border border-slate-200">
+
+            <table class="w-full border-collapse text-left">
+
+                <thead>
+                    <tr class="bg-slate-50">
+                        <th class="whitespace-nowrap border-b border-slate-200 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                            Employee #
+                        </th>
+                        <th class="whitespace-nowrap border-b border-slate-200 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                            Name
+                        </th>
+                        <th class="whitespace-nowrap border-b border-slate-200 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                            Department
+                        </th>
+                        <th class="whitespace-nowrap border-b border-slate-200 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                            Status
+                        </th>
+                        <th class="whitespace-nowrap border-b border-slate-200 px-4 py-3 text-right text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-slate-100">
+
+                    {% for e, p in rows %}
+
+                    <tr class="permanent-delete-row transition-colors hover:bg-slate-50/80"
+                        data-employee="{{ e.name.lower() }}"
+                        data-employee-number="{{ e.employee_number or '' }}">
+
+                        <td class="whitespace-nowrap px-4 py-3.5 text-sm font-medium text-slate-600">
+                            {{ e.employee_number or "" }}
+                        </td>
+
+                        <td class="whitespace-nowrap px-4 py-3.5">
+                            <span class="text-sm font-semibold text-slate-800">
+                                {{ e.name }}
+                            </span>
+                        </td>
+
+                        <td class="whitespace-nowrap px-4 py-3.5 text-sm text-slate-600">
+                            {{ e.office or "" }}
+                        </td>
+
+                        <td class="whitespace-nowrap px-4 py-3.5">
+                            <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                                {{ p.employment_status or "Inactive" }}
+                            </span>
+                        </td>
+
+                        <td class="whitespace-nowrap px-4 py-3.5">
+                            <div class="flex items-center justify-end gap-2">
+
+                                <!-- Restore -->
+                                <a href="{{ url_for('employees.edit_employee', emp_id=e.id, restore=1) }}"
+                                    title="Restore employee"
+                                    class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100">
+
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        width="15" height="15" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+                                        <path d="M3 3v5h5" />
+                                        <path d="m9 12 2 2 4-4" />
+                                    </svg>
+
+                                    Restore
+                                </a>
+
+                                <!-- Permanent Delete -->
+                                <form method="post"
+                                    action="{{ url_for('employees.permanently_delete_employee', emp_id=e.id) }}"
+                                    class="permanent-delete-form"
+                                    data-employee-name="{{ e.name }}">
+
+                                    <button type="button"
+                                        class="delete-button inline-flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100"
+                                        title="Permanently delete employee"
+                                        aria-label="Permanently delete {{ e.name }}">
+
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            width="17" height="17" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="1.8"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6" />
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                            <line x1="10" y1="11" x2="10" y2="17" />
+                                            <line x1="14" y1="11" x2="14" y2="17" />
+                                        </svg>
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- No Search Results -->
+        <div id="no-search-results" class="hidden py-10 text-center">
+            <p class="text-sm font-semibold text-slate-600">
+                No matching employees found.
+            </p>
+            <p class="mt-1 text-xs text-slate-400">
+                Try a different name or employee number.
+            </p>
+        </div>
+
+        {% else %}
+
+        <!-- Empty State -->
+        <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50/70 px-6 py-14 text-center">
+
+            <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white text-slate-400 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    width="27" height="27" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="1.6"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 11v6" />
+                    <path d="M22 21h.01" />
+                </svg>
+            </div>
+
+            <h3 class="text-sm font-bold text-slate-700">
+                No Inactive Employees
+            </h3>
+
+            <p class="mt-1 text-xs text-slate-500">
+                There are currently no inactive employee records.
+            </p>
+
+        </div>
+
+        {% endif %}
+
     </div>
 </div>
+
+<!-- Permanent Delete Confirmation Modal -->
+<div id="delete-modal"
+    class="fixed inset-0 z-50 hidden items-center justify-center">
+
+    <div id="delete-modal-backdrop"
+        class="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]">
+    </div>
+
+    <div class="relative z-10 mx-4 w-full max-w-md overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
+
+        <!-- Modal Header -->
+        <div class="flex items-center gap-3 border-b border-slate-100 px-6 py-5">
+
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-red-600">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    width="21" height="21" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18" />
+                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    <path d="m19 6-1 14H6L5 6" />
+                    <path d="M10 11v5M14 11v5" />
+                </svg>
+            </div>
+
+            <div>
+                <h3 class="text-base font-bold text-slate-800">
+                    Delete Employee
+                </h3>
+                <p class="mt-0.5 text-xs text-slate-500">
+                    Permanent deletion confirmation
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Modal Body -->
+        <div class="px-6 py-5">
+
+            <p class="text-sm leading-relaxed text-slate-700">
+                Are you sure you want to permanently delete
+                <span id="delete-employee-name" class="font-bold text-slate-900"></span>?
+            </p>
+
+            <div class="mt-4 flex items-start gap-2 rounded-lg border border-red-100 bg-red-50 p-3">
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    width="17" height="17" viewBox="0 0 24 24"
+                    fill="none" stroke="#dc2626" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"
+                    class="mt-0.5 shrink-0">
+                    <path d="M12 9v4" />
+                    <path d="M12 17h.01" />
+                    <path d="M10.3 3.9 1.8 18.1A2 2 0 0 0 3.5 21h17a2 2 0 0 0 1.7-2.9L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+                </svg>
+
+                <p class="text-xs leading-relaxed text-red-700">
+                    <strong>This action cannot be undone.</strong>
+                    The employee and their records will be permanently deleted.
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="flex flex-col-reverse gap-2 border-t border-slate-100 bg-slate-50 px-6 py-4 sm:flex-row sm:justify-end">
+
+            <button type="button" id="delete-cancel"
+                class="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
+                Cancel
+            </button>
+
+            <button type="button" id="delete-confirm"
+                class="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:ring-offset-2">
+                Permanently Delete
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
 <script>
     // Delete employee
+
     const deleteModal = document.getElementById('delete-modal');
     const deleteModalBackdrop = document.getElementById('delete-modal-backdrop');
     const deleteCancel = document.getElementById('delete-cancel');
@@ -120,6 +328,8 @@
             form.getAttribute('data-employee-name');
 
         deleteModal.classList.remove('hidden');
+        deleteModal.classList.add('flex');
+
         document.body.classList.add('overflow-hidden');
 
         deleteConfirm.focus();
@@ -127,6 +337,8 @@
 
     function closeDeleteModal() {
         deleteModal.classList.add('hidden');
+        deleteModal.classList.remove('flex');
+
         document.body.classList.remove('overflow-hidden');
 
         selectedDeleteForm = null;
@@ -157,40 +369,61 @@
         }
     });
 
-    // Fuzzy search
+
+    // Fuzzy Search
+
     function fuzzyMatch(searchStr, targetStr) {
         const search = searchStr.toLowerCase();
-        const target = targetStr.toLowerCase();
+        const target = String(targetStr || '').toLowerCase();
 
         if (search === '') return true;
         if (target.includes(search)) return true;
 
         let searchIndex = 0;
+
         for (let i = 0; i < target.length && searchIndex < search.length; i++) {
             if (target[i] === search[searchIndex]) {
                 searchIndex++;
             }
         }
+
         return searchIndex === search.length;
     }
 
     function updateFilter() {
         const searchInput = document.getElementById('search-filter');
         const searchValue = searchInput.value.trim();
+
         const rows = document.querySelectorAll('.permanent-delete-row');
+        let visibleCount = 0;
 
         rows.forEach(row => {
             const employeeName = row.getAttribute('data-employee');
             const employeeNumber = row.getAttribute('data-employee-number');
-            if (fuzzyMatch(searchValue, employeeName) || fuzzyMatch(searchValue, employeeNumber)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
+
+            const matches =
+                fuzzyMatch(searchValue, employeeName) ||
+                fuzzyMatch(searchValue, employeeNumber);
+
+            row.style.display = matches ? '' : 'none';
+
+            if (matches) {
+                visibleCount++;
             }
         });
+
+        const noResults = document.getElementById('no-search-results');
+
+        if (noResults) {
+            noResults.classList.toggle(
+                'hidden',
+                visibleCount !== 0 || searchValue === ''
+            );
+        }
     }
 
     document.getElementById('search-filter').addEventListener('input', updateFilter);
+
 </script>
 
 {% endblock %}

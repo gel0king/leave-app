@@ -1,6 +1,6 @@
 from decimal import Decimal, InvalidOperation
 from flask import flash
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import calendar
 from app.extensions import db
 from sqlalchemy import func
@@ -216,20 +216,39 @@ def parse_date(value):
     except ValueError:
         return None
 
+
 def get_used_hours(employee, leave_type_name, as_of_date=None):
 
     if as_of_date is None:
         as_of_date = date.today()
 
+    period = get_current_employment_period(employee, as_of_date)
+
+    if period is None:
+        return Decimal("0")
+
+    baseline_date = (
+        period.leave_balance_date
+        or period.start_date
+    )
+
     total = (
-        db.session.query(func.coalesce(func.sum(Log.hours), 0))
-        .join(LeaveType, Log.leave_type_id == LeaveType.id)
+        db.session.query(
+            func.coalesce(func.sum(Log.hours), 0)
+        )
+        .join(
+            LeaveType,
+            Log.leave_type_id == LeaveType.id
+        )
         .filter(
             Log.employee_id == employee.id,
             Log.action == "USED",
             LeaveType.name == leave_type_name,
+
+            Log.start_date >= baseline_date,
             Log.start_date <= as_of_date,
         )
         .scalar()
     )
+
     return Decimal(total or 0)

@@ -109,6 +109,25 @@ def form_submit():
 
     leave_type = LeaveType.query.filter_by(name=leave_type_name).first()
 
+    balance_before = calculate_leave_balance(employee)
+
+    if leave_type_name == "Sick Leave":
+        balance_before_hours = Decimal(str(balance_before["sick"]))
+
+    elif leave_type_name == "Annual Leave":
+        balance_before_hours = Decimal(str(balance_before["annual_available"]))
+
+    else:
+        balance_before_hours = None
+
+
+    balance_after_hours = (
+        balance_before_hours - total_hours
+        if balance_before_hours is not None
+        else None
+    )
+
+
     log = create_log(
         employee=employee,
         action="USED",
@@ -118,6 +137,14 @@ def form_submit():
         start_date=from_date_val,
         end_date=to_date_val,
         hours=total_hours,
+
+        old_values={
+            "leave_balance": balance_before_hours
+        } if balance_before_hours is not None else None,
+
+        new_values={
+            "leave_balance": balance_after_hours
+        } if balance_after_hours is not None else None,
     )
 
     db.session.flush()

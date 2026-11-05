@@ -1,290 +1,581 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
 
-<div class="bg-white rounded-lg p-6 shadow-sm">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-semibold text-[#1e3f3d] m-0">History</h2>
-        <a href="{{ url_for('history.history', order='ASC' if order == 'DESC' else 'DESC', start_date=start_date, end_date=end_date ) }}"
-            class="px-3 py-2 bg-[#1e3f3d] text-white rounded-md text-sm font-medium hover:bg-[#16302d] transition-colors no-underline">
-            Date {% if order == 'DESC' %}↓{% else %}↑{% endif %}
+{% block content %}
+
+<div class="space-y-6">
+
+    <!-- Page heading -->
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+        <div>
+            <h1 class="m-0 text-2xl font-bold tracking-tight text-[#173f3a]">
+                Activity History
+            </h1>
+
+            <p class="mt-1 text-sm text-gray-500">
+                Track employee updates, leave activity, and changes made within the system.
+            </p>
+        </div>
+
+        <!-- Date sorting -->
+
+        <a href="{{ url_for('history.history', order='ASC' if order == 'DESC' else 'DESC', start_date=start_date, end_date=end_date) }}"
+            class="inline-flex w-fit items-center justify-center gap-2 rounded-lg bg-[#173f3a] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#22574f] no-underline">
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+                <path d="M8 6h13" />
+                <path d="M8 12h13" />
+                <path d="M8 18h13" />
+                <path d="m3 6 2-2 2 2" />
+                <path d="M5 4v16" />
+
+            </svg>
+
+            Date {% if order == 'DESC' %}Newest first ↓{% else %}Oldest first ↑{% endif %}
+
         </a>
+
     </div>
-    <div class="mb-4">
-        <input type="text" id="search-filter" placeholder="Search by employee name or number..."
-            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3f3d]" />
-    </div>
-    <div class="mb-4 flex flex-col sm:flex-row gap-3 items-end">
-        <div class="w-full sm:w-auto">
-            <label for="start-date" class="block text-sm font-medium text-gray-700 mb-1">
-                From
-            </label>
-            <input type="date" id="start-date" name="start_date" value="{{ start_date }}" form="date-filter-form"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3f3d]" />
+
+
+    <!-- Search and date filters -->
+
+    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+
+        <div class="mb-4">
+            <h3 class="text-sm font-bold text-gray-800">
+                Search & Filter Activity
+            </h3>
+
+            <p class="mt-1 text-xs text-gray-500">
+                Find employee activity using a name, employee number, or date range.
+            </p>
         </div>
-        <div class="w-full sm:w-auto">
-            <label for="end-date" class="block text-sm font-medium text-gray-700 mb-1">
-                To
+
+
+        <!-- Search -->
+
+        <div class="mb-5">
+
+            <label for="search-filter" class="mb-1.5 block text-xs font-semibold text-gray-600">
+
+                Search Employees
+
             </label>
-            <input type="date" id="end-date" name="end_date" value="{{ end_date }}" form="date-filter-form"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3f3d]" />
+
+            <div class="relative">
+
+                <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    stroke-width="2">
+
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+
+                </svg>
+
+                <input type="text" id="search-filter" placeholder="Search by employee name or employee number..."
+                    class="w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-[#27836f] focus:bg-white focus:ring-2 focus:ring-[#27836f]/10" />
+
+            </div>
+
         </div>
-        <form id="date-filter-form" method="GET" action="{{ url_for('history.history') }}" class="flex gap-2">
+
+
+        <!-- Date filters -->
+
+        <form id="date-filter-form" method="GET" action="{{ url_for('history.history') }}"
+            class="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end">
+
             <input type="hidden" name="order" value="{{ order }}" />
 
-            <button type="submit"
-                class="px-4 py-2 bg-[#1e3f3d] text-white rounded-md text-sm font-medium hover:bg-[#16302d] transition-colors">
-                Filter
-            </button>
-            {% if start_date or end_date %}
-            <a href="{{ url_for('history.history', order=order) }}"
-                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-300 transition-colors no-underline">
-                Clear
-            </a>
-            {% endif %}
+
+            <div class="w-full sm:w-auto">
+
+                <label for="start-date" class="mb-1.5 block text-xs font-semibold text-gray-600">
+
+                    From Date
+
+                </label>
+
+                <input type="date" id="start-date" name="start_date" value="{{ start_date }}"
+                    class="w-full min-w-[190px] rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#27836f] focus:bg-white focus:ring-2 focus:ring-[#27836f]/10" />
+
+            </div>
+
+
+            <div class="w-full sm:w-auto">
+
+                <label for="end-date" class="mb-1.5 block text-xs font-semibold text-gray-600">
+
+                    To Date
+
+                </label>
+
+                <input type="date" id="end-date" name="end_date" value="{{ end_date }}"
+                    class="w-full min-w-[190px] rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#27836f] focus:bg-white focus:ring-2 focus:ring-[#27836f]/10" />
+
+            </div>
+
+
+            <!-- Filter buttons -->
+
+            <div class="flex flex-wrap items-center gap-2">
+
+                <button type="submit"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#173f3a] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#22574f]">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round">
+
+                        <path d="M4 5h16" />
+                        <path d="M7 12h10" />
+                        <path d="M10 19h4" />
+
+                    </svg>
+
+                    Apply Filters
+
+                </button>
+
+
+                {% if start_date or end_date %}
+
+                <a href="{{ url_for('history.history', order=order) }}"
+                    class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50 no-underline">
+
+                    Clear Filters
+
+                </a>
+
+                {% endif %}
+
+            </div>
+
         </form>
+
     </div>
-    {% if events %}
+
+    <!-- Activity records -->
+
+    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+
+        <!-- Table heading -->
+
+        <div
+            class="flex flex-col gap-2 border-b border-gray-100 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+                <h3 class="text-base font-bold text-[#173f3a]">
+                    Activity Records
+                </h3>
+
+                <p class="mt-1 text-xs text-gray-500">
+                    A chronological record of employee activity and system changes.
+                </p>
+            </div>
+
+            <span
+                class="inline-flex w-fit items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
+                {{ events|length }} activities
+            </span>
+
+        </div>
+
+
+        <!-- Table -->
+
+        {% if events %}
+
         <div class="overflow-x-auto">
-            <table class="w-full border-collapse" id="history-table">
-                <thead>
-                    <tr class="bg-gray-100">
-                        <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-gray-200">
+
+            <table class="w-full border-collapse text-left" id="history-table">
+
+                <thead class="bg-gray-50">
+
+                    <tr>
+
+                        <th
+                            class="whitespace-nowrap px-5 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
                             Date
                         </th>
-                        <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-gray-200">
+
+                        <th
+                            class="whitespace-nowrap px-5 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
                             Employee
                         </th>
-                        <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-gray-200">
+
+                        <th
+                            class="whitespace-nowrap px-5 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
                             Action
                         </th>
-                        <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-gray-200">
+
+                        <th class="min-w-[200px] px-5 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
                             Description
                         </th>
-                        <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-gray-200">
+
+                        <th class="min-w-[180px] px-5 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
                             Notes
                         </th>
-                        <th class="px-4 py-3 text-left text-sm font-bold text-[#1e3f3d] border-b border-gray-200">
+
+                        <th
+                            class="whitespace-nowrap px-5 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
                             Changes
                         </th>
+
                     </tr>
+
                 </thead>
-                <tbody>
+
+
+                <tbody class="divide-y divide-gray-100">
+
                     {% for event in events %}
-                    <tr class="hover:bg-gray-50 transition-colors history-row"
-                        data-employee="{{ (event.employee.name or '').lower() }}" 
+
+                    <tr class="history-row transition-colors hover:bg-[#f8faf9]"
+                        data-employee="{{ (event.employee.name or '').lower() }}"
                         data-employee-number="{{ event.employee.employee_number or '' }}"
                         data-action="{{ event.action }}">
-                        <td class="px-4 py-3 text-sm border-b border-gray-200 whitespace-nowrap">
-                            {{ event.time_created.strftime('%m/%d/%Y') }}
+
+
+                        <!-- Date -->
+
+                        <td class="whitespace-nowrap px-5 py-4">
+
+                            <span class="text-sm font-medium text-gray-700">
+                                {{ event.time_created.strftime('%m/%d/%Y') }}
+                            </span>
+
                         </td>
-                        <td class="px-4 py-3 text-sm border-b border-gray-200">
-                            <div>
+
+
+                        <!-- Employee -->
+
+                        <td class="whitespace-nowrap px-5 py-4">
+
+                            <div class="text-sm font-semibold text-gray-800">
                                 {{ event.employee.name or 'N/A' }}
                             </div>
+
                             {% if event.employee.employee_number %}
-                            <div class="text-xs text-gray-600">
+
+                            <div class="mt-1 text-xs text-gray-400">
                                 #{{ event.employee.employee_number }}
                             </div>
+
                             {% endif %}
+
                         </td>
-                        <td class="px-4 py-3 text-sm border-b border-gray-200">
-                            <span class="inline-block px-2 py-1 rounded text-xs font-medium {% if event.action == 'CREATE' %}bg-green-100 text-green-800 {% elif event.action == 'UPDATE' %}bg-blue-100 text-blue-800 {% elif event.action == 'DEACTIVATE' %}bg-red-100 text-red-800 {% elif event.action == 'USED' %}bg-amber-100 text-amber-800 {% else %}bg-gray-100 text-gray-800 {% endif %}">
+
+
+                        <!-- Action -->
+
+                        <td class="whitespace-nowrap px-5 py-4">
+
+                            {% if event.action == 'CREATE' %}
+
+                            <span
+                                class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700">
+                                <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                                CREATE
+                            </span>
+
+                            {% elif event.action == 'UPDATE' %}
+
+                            <span
+                                class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
+                                <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                                UPDATE
+                            </span>
+
+                            {% elif event.action == 'DEACTIVATE' %}
+
+                            <span
+                                class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700">
+                                <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                DEACTIVATE
+                            </span>
+
+                            {% elif event.action == 'USED' %}
+
+                            <span
+                                class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700">
+                                <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                                USED
+                            </span>
+
+                            {% else %}
+
+                            <span
+                                class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-600">
+                                <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>
                                 {{ event.action }}
                             </span>
+
+                            {% endif %}
+
                         </td>
-                        <td class="px-4 py-3 text-sm border-b border-gray-200">
-                            {{ event.description or '-' }}
+
+
+                        <!-- Description -->
+
+                        <td class="px-5 py-4">
+
+                            <span class="text-sm leading-relaxed text-gray-700">
+                                {{ event.description or '-' }}
+                            </span>
+
                         </td>
-                        <td class="px-4 py-3 text-sm border-b border-gray-200">
-                            {{ event.notes or '-' }}
+
+
+                        <!-- Notes -->
+
+                        <td class="px-5 py-4">
+
+                            <span class="text-sm leading-relaxed text-gray-500">
+                                {{ event.notes or '-' }}
+                            </span>
+
                         </td>
-                        <td class="px-4 py-3 text-sm border-b border-gray-200 align-top">
+
+
+                        <!-- Changes -->
+
+                        <td class="px-5 py-4 align-top">
+
                             {% if event.old_values_display or event.new_values_display or event.leave_type or
                             event.start_date or event.end_date or event.hours is not none %}
+
+
                             <details class="group">
+
                                 <summary
-                                    class="inline-flex items-center gap-1.5 cursor-pointer select-none text-[#2f5d5a] hover:text-[#1e3f3d] font-medium text-sm list-none">
-                                    <svg class="w-4 h-4 transition-transform group-open:rotate-90"
+                                    class="inline-flex cursor-pointer list-none items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-[#27836f] transition-colors hover:bg-[#eef6f3] hover:text-[#173f3a]">
+
+                                    <svg class="h-4 w-4 transition-transform group-open:rotate-90"
                                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7" />
+
                                     </svg>
-                                    View changes
+
+                                    View details
+
                                 </summary>
+
                                 <div
-                                    class="mt-3 w-full min-w-[420px] max-w-2xl rounded-md bg-white shadow-sm overflow-hidden">
-                                    {% if event.old_values_display or event.new_values_display %}
+                                    class="mt-3 w-full min-w-[460px] max-w-2xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
 
-                                    {% set old_values = event.old_values_display or {} %}
-                                    {% set new_values = event.new_values_display or {} %}
+                                    <!-- Heading -->
 
-                                    {% set fields = [] %}
+                                    <div class="border-b border-gray-100 bg-[#f8faf9] px-4 py-3">
 
-                                    {% for key in old_values %}
-                                    {% if key not in fields %}
-                                    {% set _ = fields.append(key) %}
-                                    {% endif %}
-                                    {% endfor %}
+                                        <h4 class="text-xs font-bold uppercase tracking-wider text-[#173f3a]">
+                                            Activity Details
+                                        </h4>
 
-                                    {% for key in new_values %}
-                                    {% if key not in fields %}
-                                    {% set _ = fields.append(key) %}
-                                    {% endif %}
-                                    {% endfor %}
-
-
-                                    <div class="px-4 py-3 bg-gray-100 border-b border-gray-200">
-                                        <div class="text-xs font-semibold uppercase tracking-wide text-[#6b7275]">
-                                            Changes
-                                        </div>
                                     </div>
-                                    <div class="grid grid-cols-[1.4fr_1fr_1fr] bg-gray-50 border-b border-gray-200">
-                                        <div class="px-4 py-2.5 text-xs font-semibold text-gray-600">
+
+
+                                    <!-- Grid headings -->
+
+                                    <div class="grid grid-cols-[1.4fr_1fr_1fr] border-b border-gray-200 bg-gray-50">
+
+                                        <div class="px-4 py-3 text-xs font-semibold text-gray-500">
                                             Field
                                         </div>
+
                                         <div
-                                            class="px-4 py-2.5 text-xs font-semibold text-gray-600 border-l border-gray-200">
+                                            class="border-l border-gray-200 px-4 py-3 text-xs font-semibold text-gray-500">
                                             Previous
                                         </div>
+
                                         <div
-                                            class="px-4 py-2.5 text-xs font-semibold text-gray-600 border-l border-gray-200">
+                                            class="border-l border-gray-200 px-4 py-3 text-xs font-semibold text-gray-500">
                                             New
                                         </div>
+
                                     </div>
-                                    {% for field in fields %}
 
-                                    {% set old_value = old_values.get(field) %}
-                                    {% set new_value = new_values.get(field) %}
 
-                                    {% if old_value != new_value %}
+                                    <!-- All changes -->
 
-                                    <div class="grid grid-cols-[1.4fr_1fr_1fr] border-b border-gray-100 last:border-b-0">
-                                        <div class="px-4 py-2.5 font-medium text-gray-700 break-words">
-                                            {{ field|replace('_', ' ')|upper }}
+                                    {% for change in event.changes_display %}
+
+                                    <div
+                                        class="grid grid-cols-[1.4fr_1fr_1fr] border-b border-gray-100 last:border-b-0">
+
+                                        <div class="break-words px-4 py-3 text-xs font-semibold text-gray-700">
+                                            {{ change.field|replace('_', ' ')|title }}
                                         </div>
-                                        <div class="px-4 py-2.5 border-l border-gray-100 break-words">
-                                            {% if old_value is none or old_value == '' %}
-                                            <span class="text-gray-400">-</span>
+
+                                        <div
+                                            class="break-words border-l border-gray-100 px-4 py-3 text-xs text-gray-600">
+
+                                            {% if change.old is none or change.old == '' %}
+                                            <span class="text-gray-300">—</span>
                                             {% else %}
-                                            {{ old_value }}
+                                            {{ change.old }}
                                             {% endif %}
+
                                         </div>
-                                        <div class="px-4 py-2.5 border-l border-gray-100 break-words">
-                                            {% if new_value is none or new_value == '' %}
-                                            <span class="text-gray-400">-</span>
+
+                                        <div
+                                            class="break-words border-l border-gray-100 px-4 py-3 text-xs font-medium text-[#173f3a]">
+
+                                            {% if change.new is none or change.new == '' %}
+                                            <span class="text-gray-300">—</span>
                                             {% else %}
-                                            {{ new_value }}
+                                            {{ change.new }}
                                             {% endif %}
+
                                         </div>
+
                                     </div>
-                                    {% endif %}
+
+                                    {% else %}
+
+                                    <div class="px-4 py-6 text-center text-xs text-gray-400">
+                                        No individual field changes were recorded.
+                                    </div>
 
                                     {% endfor %}
 
                                 </div>
-                                {% endif %}
 
-                                {% if event.leave_type or event.start_date or event.end_date or event.hours is not none %}
-                                <div class="{% if event.old_values_display or event.new_values_display %}border-t border-[#d9d3c4]{% endif %}">
-                                    <div class="px-4 py-3 bg-[#f7f5ef] border-b border-[#d9d3c4]">
-                                        <div class="text-xs font-semibold uppercase tracking-wide text-[#6b7275]">
-                                            Leave Details
-                                        </div>
-                                    </div>
-                                    <div class="px-4 py-3 space-y-2 text-sm">
-                                        {% if event.leave_type %}
-                                        <div class="flex">
-                                            <span class="w-32 font-medium text-gray-600">
-                                                Leave Type
-                                            </span>
-                                            <span class="text-gray-800">
-                                                {{ event.leave_type.name }}
-                                            </span>
-                                        </div>
-                                        {% endif %}
-                                        {% if event.start_date %}
-                                        <div class="flex">
-                                            <span class="w-32 font-medium text-gray-600">
-                                                Start Date
-                                            </span>
-                                            <span class="text-gray-800">
-                                                {{ event.start_date.strftime('%m/%d/%Y') }}
-                                            </span>
-                                        </div>
-                                        {% endif %}
-                                        {% if event.end_date %}
-                                        <div class="flex">
-                                            <span class="w-32 font-medium text-gray-600">
-                                                End Date
-                                            </span>
-
-                                            <span class="text-gray-800">
-                                                {{ event.end_date.strftime('%m/%d/%Y') }}
-                                            </span>
-                                        </div>
-                                        {% endif %}
-                                        {% if event.hours is not none %}
-                                        <div class="flex">
-                                            <span class="w-32 font-medium text-gray-600">
-                                                Hours
-                                            </span>
-                                            <span class="text-gray-800">
-                                                {{ event.hours }}
-                                            </span>
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                {% endif %}
-                                </div>
                             </details>
+
+
                             {% else %}
-                            <span class="text-gray-400">-</span>
+
+                            <span class="text-sm text-gray-300">—</span>
+
                             {% endif %}
+
                         </td>
+
                     </tr>
+
                     {% endfor %}
+
                 </tbody>
+
             </table>
+
         </div>
-    {% else %}
-        <p class="text-gray-500 italic">No activity history yet.</p>
-    {% endif %}
-</div>
-<script>
-  // Fuzzy search
-  function fuzzyMatch(searchStr, targetStr) {
-    const search = searchStr.toLowerCase();
-    const target = targetStr.toLowerCase();
-    
-    if (search === '') return true;
-    if (target.includes(search)) return true;
-    
-    let searchIndex = 0;
-    for (let i = 0; i < target.length && searchIndex < search.length; i++) {
-      if (target[i] === search[searchIndex]) {
-        searchIndex++;
-      }
-    }
-    return searchIndex === search.length;
-  }
 
-  function updateFilter() {
-    const searchInput = document.getElementById('search-filter');
-    const searchValue = searchInput.value.trim();
-    const rows = document.querySelectorAll('.history-row');
-    
-    rows.forEach(row => {
-      const employeeName = row.getAttribute('data-employee');
-      const employeeNumber = row.getAttribute('data-employee-number');
-      if (fuzzyMatch(searchValue, employeeName) || fuzzyMatch(searchValue, employeeNumber)) {
-        row.style.display = '';
-      } else {
-        row.style.display = 'none';
-      }
-    });
-  }
-  
-  document.getElementById('search-filter').addEventListener('input', updateFilter);
-</script>
+        {% else %}
 
-{% endblock %}
+        <div class="px-6 py-16 text-center">
+
+            <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100">
+
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.6" class="text-gray-400">
+
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+
+                </svg>
+
+            </div>
+
+            <h3 class="text-base font-semibold text-gray-700">
+                No activity found
+            </h3>
+
+            <p class="mt-1 text-sm text-gray-400">
+                Employee activity will appear here when changes are recorded.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <script>
+        // Fuzzy employee search
+
+        function fuzzyMatch(searchStr, targetStr) {
+
+            const search = searchStr.toLowerCase();
+            const target = targetStr.toLowerCase();
+
+            if (search === '') return true;
+
+            if (target.includes(search)) return true;
+
+            let searchIndex = 0;
+
+            for (
+                let i = 0;
+                i < target.length && searchIndex < search.length;
+                i++
+            ) {
+
+                if (target[i] === search[searchIndex]) {
+                    searchIndex++;
+                }
+
+            }
+
+            return searchIndex === search.length;
+
+        }
+
+
+        // Filter history records
+
+        function updateFilter() {
+
+            const searchInput = document.getElementById('search-filter');
+
+            const searchValue = searchInput.value.trim();
+
+            const rows = document.querySelectorAll('.history-row');
+
+            rows.forEach(row => {
+
+                const employeeName = row.getAttribute('data-employee') || '';
+
+                const employeeNumber = row.getAttribute('data-employee-number') || '';
+
+                if (
+                    fuzzyMatch(searchValue, employeeName) ||
+                    fuzzyMatch(searchValue, employeeNumber)
+                ) {
+
+                    row.style.display = '';
+
+                } else {
+
+                    row.style.display = 'none';
+
+                }
+
+            });
+
+        }
+
+
+        // Search event
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const searchInput = document.getElementById('search-filter');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', updateFilter);
+            }
+
+        });
+
+    </script>
+
+    {% endblock %}

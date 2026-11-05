@@ -1,0 +1,545 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="space-y-6">
+
+    <!-- Page heading -->
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-[#173f3a]">
+                Company Insurance
+            </h1>
+
+            <p class="mt-1 text-sm text-gray-500">
+                Manage company-wide insurance policies and monitor renewal dates.
+            </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+
+            <a href="{{ url_for('notifications.compliance') }}"
+               class="rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 no-underline">
+                ← Back to Compliance
+            </a>
+
+            <button type="button"
+                    onclick="openAddModal()"
+                    class="rounded-lg bg-[#173f3a] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#22574f]">
+                + Add Insurance Policy
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Summary cards -->
+
+    {% set expired_count = policies|selectattr('status', 'equalto', 'expired')|list|length %}
+    {% set soon_count = policies|selectattr('status', 'equalto', 'expiring_soon')|list|length %}
+    {% set upcoming_count = policies|selectattr('status', 'equalto', 'upcoming')|list|length %}
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+            <p class="text-sm font-medium text-gray-500">Total Policies</p>
+            <p class="mt-2 text-3xl font-bold text-[#173f3a]">
+                {{ policies|length }}
+            </p>
+        </div>
+
+        <div class="rounded-xl border border-red-100 bg-white p-5 shadow-sm">
+            <p class="text-sm font-medium text-gray-500">Expired Policies</p>
+            <p class="mt-2 text-3xl font-bold text-red-600">
+                {{ expired_count }}
+            </p>
+        </div>
+
+        <div class="rounded-xl border border-amber-100 bg-white p-5 shadow-sm">
+            <p class="text-sm font-medium text-gray-500">Expiring Within 30 Days</p>
+            <p class="mt-2 text-3xl font-bold text-amber-600">
+                {{ soon_count }}
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- Policy records -->
+
+    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+
+        <div class="flex flex-col gap-2 border-b border-gray-100 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+                <h2 class="text-base font-bold text-[#173f3a]">
+                    Insurance Policies
+                </h2>
+
+                <p class="mt-1 text-xs text-gray-500">
+                    Company-wide insurance coverage and expiration information.
+                </p>
+            </div>
+
+            <span class="w-fit rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
+                {{ policies|length }} policies
+            </span>
+
+        </div>
+
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full border-collapse text-left">
+
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="whitespace-nowrap px-5 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
+                            Policy
+                        </th>
+
+                        <th class="whitespace-nowrap px-5 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
+                            Policy Number
+                        </th>
+
+                        <th class="whitespace-nowrap px-5 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
+                            Expiration Date
+                        </th>
+
+                        <th class="whitespace-nowrap px-5 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
+                            Days Remaining
+                        </th>
+
+                        <th class="whitespace-nowrap px-5 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
+                            Status
+                        </th>
+
+                        <th class="whitespace-nowrap px-5 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+
+
+                <tbody class="divide-y divide-gray-100">
+
+                    {% for policy in policies %}
+
+                    <tr class="transition-colors hover:bg-[#f8faf9]">
+
+                        <td class="px-5 py-4">
+                            <div class="text-sm font-semibold text-gray-800">
+                                {{ policy.policy_name }}
+                            </div>
+
+                            {% if policy.notes %}
+                            <div class="mt-1 max-w-xs truncate text-xs text-gray-400"
+                                 title="{{ policy.notes }}">
+                                {{ policy.notes }}
+                            </div>
+                            {% endif %}
+                        </td>
+
+
+                        <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500">
+                            {{ policy.policy_number or "—" }}
+                        </td>
+
+
+                        <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-700">
+                            {{ policy.expiration_date.strftime('%b %d, %Y') }}
+                        </td>
+
+
+                        <td class="whitespace-nowrap px-5 py-4">
+
+                            {% if policy.days_remaining < 0 %}
+
+                            <span class="text-sm font-semibold text-red-600">
+                                {{ policy.days_remaining|abs }} days overdue
+                            </span>
+
+                            {% elif policy.days_remaining == 0 %}
+
+                            <span class="text-sm font-semibold text-amber-600">
+                                Expires today
+                            </span>
+
+                            {% else %}
+
+                            <span class="text-sm text-gray-700">
+                                {{ policy.days_remaining }} days
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td class="whitespace-nowrap px-5 py-4">
+
+                            {% if policy.status == "expired" %}
+
+                            <span class="rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700">
+                                Expired
+                            </span>
+
+                            {% elif policy.status == "expiring_soon" %}
+
+                            <span class="rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700">
+                                Expiring Soon
+                            </span>
+
+                            {% elif policy.status == "upcoming" %}
+
+                            <span class="rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
+                                Upcoming
+                            </span>
+
+                            {% else %}
+
+                            <span class="rounded-full bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700">
+                                Current
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td class="whitespace-nowrap px-5 py-4">
+
+                            <button
+                                type="button"
+                                class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-[#173f3a] hover:bg-gray-50"
+                                data-edit-url="{{ url_for('notifications.edit_company_insurance', policy_id=policy.id) }}"
+                                data-policy-name="{{ policy.policy_name }}"
+                                data-policy-number="{{ policy.policy_number or '' }}"
+                                data-expiration-date="{{ policy.expiration_date.isoformat() }}"
+                                data-notes="{{ policy.notes or '' }}"
+                                onclick="openEditModal(this)">
+
+                                Edit Policy
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="6" class="px-5 py-16 text-center">
+
+                            <h3 class="text-sm font-semibold text-gray-700">
+                                No insurance policies found
+                            </h3>
+
+                            <p class="mt-1 text-xs text-gray-400">
+                                Add your first company insurance policy to get started.
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Insurance Policy Modal -->
+
+<div id="insurance-modal"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+
+    <div class="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
+
+        <div class="flex items-center justify-between">
+
+            <h2 id="modal-title" class="text-lg font-bold text-[#173f3a]">
+                Add Insurance Policy
+            </h2>
+
+            <button type="button"
+                    onclick="closeInsuranceModal()"
+                    class="text-xl text-gray-400 hover:text-gray-700">
+                &times;
+            </button>
+
+        </div>
+
+        <p class="mt-1 text-sm text-gray-500">
+            Enter the company-wide insurance policy information.
+        </p>
+
+
+        <form id="insurance-form" class="mt-5 space-y-4">
+
+            <input type="hidden" id="policy-id">
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">
+                    Policy Name *
+                </label>
+
+                <input
+                    type="text"
+                    name="policy_name"
+                    id="policy-name"
+                    required
+                    class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-[#27836f] focus:outline-none">
+            </div>
+
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">
+                    Policy Number
+                </label>
+
+                <input
+                    type="text"
+                    name="policy_number"
+                    id="policy-number"
+                    class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-[#27836f] focus:outline-none">
+            </div>
+
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">
+                    Expiration Date *
+                </label>
+
+                <input
+                    type="date"
+                    name="expiration_date"
+                    id="expiration-date"
+                    required
+                    class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-[#27836f] focus:outline-none">
+            </div>
+
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">
+                    Notes
+                </label>
+
+                <textarea
+                    name="notes"
+                    id="policy-notes"
+                    rows="3"
+                    class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-[#27836f] focus:outline-none"
+                    placeholder="Additional policy information..."></textarea>
+            </div>
+
+
+            <div id="insurance-error"
+                 class="hidden rounded-lg bg-red-50 p-3 text-sm text-red-600">
+            </div>
+
+
+            <div class="flex justify-end gap-3 pt-2">
+
+                <button
+                    type="button"
+                    onclick="closeInsuranceModal()"
+                    class="rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50">
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    id="save-policy-button"
+                    class="rounded-lg bg-[#173f3a] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#22574f]">
+                    Save Policy
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+const insuranceModal = document.getElementById("insurance-modal");
+const insuranceForm = document.getElementById("insurance-form");
+
+const addInsuranceUrl = "{{ url_for('notifications.add_company_insurance') }}";
+
+let insuranceEditUrl = null;
+
+
+// ========================================
+// OPEN ADD MODAL
+// ========================================
+
+function openAddModal() {
+
+    insuranceForm.reset();
+
+    insuranceEditUrl = null;
+
+    document.getElementById("modal-title").textContent =
+        "Add Insurance Policy";
+
+    document.getElementById("save-policy-button").textContent =
+        "Save Policy";
+
+    document.getElementById("insurance-error").classList.add("hidden");
+
+    insuranceModal.classList.remove("hidden");
+
+}
+
+
+// ========================================
+// OPEN EDIT MODAL
+// ========================================
+
+function openEditModal(button) {
+
+    insuranceForm.reset();
+
+    insuranceEditUrl = button.dataset.editUrl;
+
+    document.getElementById("modal-title").textContent =
+        "Edit Insurance Policy";
+
+    document.getElementById("save-policy-button").textContent =
+        "Update Policy";
+
+    document.getElementById("policy-name").value =
+        button.dataset.policyName;
+
+    document.getElementById("policy-number").value =
+        button.dataset.policyNumber;
+
+    document.getElementById("expiration-date").value =
+        button.dataset.expirationDate;
+
+    document.getElementById("policy-notes").value =
+        button.dataset.notes;
+
+    document.getElementById("insurance-error").classList.add("hidden");
+
+    insuranceModal.classList.remove("hidden");
+
+}
+
+
+// ========================================
+// CLOSE MODAL
+// ========================================
+
+function closeInsuranceModal() {
+
+    insuranceModal.classList.add("hidden");
+
+    insuranceForm.reset();
+
+    insuranceEditUrl = null;
+
+}
+
+
+// ========================================
+// SAVE OR UPDATE POLICY
+// ========================================
+
+insuranceForm.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const saveButton =
+        document.getElementById("save-policy-button");
+
+    const errorBox =
+        document.getElementById("insurance-error");
+
+    const formData = new FormData(this);
+
+    const url = insuranceEditUrl || addInsuranceUrl;
+
+    errorBox.classList.add("hidden");
+
+    saveButton.disabled = true;
+
+    saveButton.textContent = "Saving...";
+
+    try {
+
+        const response = await fetch(url, {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+
+            throw new Error(
+                result.message || "Unable to save insurance policy."
+            );
+
+        }
+
+        closeInsuranceModal();
+
+        window.location.reload();
+
+    } catch (error) {
+
+        errorBox.textContent = error.message;
+
+        errorBox.classList.remove("hidden");
+
+    } finally {
+
+        saveButton.disabled = false;
+
+        saveButton.textContent =
+            insuranceEditUrl ? "Update Policy" : "Save Policy";
+
+    }
+
+});
+
+
+// ========================================
+// CLOSE WHEN CLICKING OUTSIDE MODAL
+// ========================================
+
+insuranceModal.addEventListener("click", function(event) {
+
+    if (event.target === insuranceModal) {
+        closeInsuranceModal();
+    }
+
+});
+
+
+document.addEventListener("keydown", function(event) {
+
+    if (event.key === "Escape") {
+        closeInsuranceModal();
+    }
+
+});
+
+</script>
+
+{% endblock %}

@@ -6,3 +6,4 @@ Pillow==12.3.0
 pymupdf==1.28.2
 pypdf==6.16.2
 reportlab==5.0.1
+openpyxl
