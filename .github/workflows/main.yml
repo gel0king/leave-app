@@ -28,13 +28,32 @@ jobs:
           pip install pyinstaller
 
       - name: Build LeaveApp
+        shell: pwsh
         run: |
-          pyinstaller --name LeaveApp --onedir --console app.py
+          pyinstaller --name LeaveApp --onedir --console `
+            --add-data "app/templates;app/templates" `
+            --add-data "app/static;app/static" `
+            app.py
 
       - name: Copy configuration file
         shell: pwsh
         run: |
           Copy-Item config.json dist/LeaveApp/config.json
+
+      - name: Verify packaged files
+        shell: pwsh
+        run: |
+          if (!(Test-Path "dist/LeaveApp/app/templates/base.html")) {
+            throw "Missing base.html!"
+          }
+
+          if (!(Test-Path "dist/LeaveApp/app/static/css/style.css")) {
+            throw "Missing style.css!"
+          }
+
+          if (!(Test-Path "dist/LeaveApp/config.json")) {
+            throw "Missing config.json!"
+          }
 
       - name: Create ZIP
         shell: pwsh
