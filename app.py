@@ -51,7 +51,7 @@ if __name__ == "__main__":
             host=HOST,
             port=PORT,
             debug=False,
-            use_reloader=True,
+            use_reloader=False,
         )
     finally:
         scheduler.shutdown(wait=True)
