@@ -1,4 +1,6 @@
+
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -18,7 +20,7 @@ ENV_PATH = APP_DIR / ".env"
 
 
 def load_environment():
-    load_dotenv(ENV_PATH)
+    load_dotenv(ENV_PATH, override=True)
 
 
 def _load_config(config_path=CONFIG_PATH):
@@ -48,28 +50,41 @@ def _resolve_path(path_value, config_path=CONFIG_PATH):
     return path.resolve()
 
 
-def get_db_path(config_path=CONFIG_PATH):
-    config = _load_config(config_path)
-
-    if config is None:
-        return None
-
-    db_path = _resolve_path(config["DATABASE"], config_path)
-
-    db_path.parent.mkdir(parents=True, exist_ok=True)
-
-    return str(db_path)
-
-
 def get_database_uri():
-    db_path = get_db_path()
+    """
+    Return the Neon PostgreSQL connection string.
+    SQLite is no longer supported.
+    """
+    database_url = os.getenv("DATABASE_URL")
 
-    if db_path is None:
-        raise RuntimeError("Could not determine database path.")
+    if not database_url:
+        raise RuntimeError(
+            "DATABASE_URL is missing. "
+            "Configure your Neon PostgreSQL connection in .env."
+        )
 
-    db_path = Path(db_path).as_posix()
+    if database_url.startswith("postgresql://"):
+        database_url = database_url.replace(
+            "postgresql://",
+            "postgresql+psycopg://",
+            1
+        )
 
-    return f"sqlite:///{db_path}"
+    if not database_url.startswith("postgresql+psycopg://"):
+        raise RuntimeError(
+            "DATABASE_URL must use PostgreSQL with Psycopg 3."
+        )
+
+    return database_url
+
+
+def get_database_engine_options():
+    return {
+        "pool_pre_ping": True,
+        "pool_size": 3,
+        "max_overflow": 2,
+        "pool_timeout": 30,
+    }
 
 
 def get_form_path(config_path=CONFIG_PATH):
@@ -93,6 +108,9 @@ def get_leave_requests_dir(config_path=CONFIG_PATH):
         return None
 
     requests_value = config.get("LEAVE_REQUESTS")
+
+    if not requests_value:
+        raise RuntimeError("LEAVE_REQUESTS is missing from config.json")
 
     requests_dir = _resolve_path(requests_value, config_path)
 

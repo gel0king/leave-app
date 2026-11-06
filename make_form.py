@@ -1,7 +1,7 @@
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.colors import HexColor, black
-import fitz
+import pymupdf
 
 OUT = "./leave_request_template.pdf"
 INK = black
@@ -74,7 +74,7 @@ def text_field(name, x, y, w, h=16, tooltip=None, font_size=11, value=""):
     )
 
 def center_form_fields(pdf_path, field_names):
-    doc = fitz.open(pdf_path)
+    doc = pymupdf.open(pdf_path)
 
     for page in doc:
         widgets = page.widgets()
@@ -128,7 +128,7 @@ def generate_leave_form_template(output_path):
     box(left, y - row_h, right - left, row_h)
     label(left + 4, y - row_h + 7, "Program/Office:")
     text_field("program_office", left + 100, y - row_h + 5, 260, value="Texas Cooperative Inspection Program")
-    text_field("office_location", left + 400, y - row_h + 5, right - (left + 400) - 4, value="Alamo, Texas")
+    text_field("office_location", left + 400, y - row_h + 5, right - (left + 400) - 4, value="Pharr, Texas")
     y -= row_h
 
     # Row: "I request leave or overtime as specified below" + checkbox grid

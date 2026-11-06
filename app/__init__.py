@@ -1,7 +1,7 @@
 from flask import Flask
 
 from app.routes import register_routes
-from app.utils.config import get_database_uri, get_form_path
+from app.utils.config import get_database_uri, get_form_path, load_environment, get_database_engine_options
 
 from .extensions import db
 from . import models
@@ -34,11 +34,15 @@ def seed_leave_types():
     db.session.commit()
 
 def create_app():
+    load_environment()
+
     app = Flask(__name__, template_folder="templates", static_folder="static")
 
     app.config["SECRET_KEY"] = get_or_create_secret("FLASK_SECRET_KEY")
     
     app.config["SQLALCHEMY_DATABASE_URI"] = get_database_uri()
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = (get_database_engine_options())
+
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
