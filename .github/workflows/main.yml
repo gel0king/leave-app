@@ -1,3 +1,4 @@
+
 name: Build and Release LeaveApp
 
 on:
@@ -30,35 +31,47 @@ jobs:
       - name: Build LeaveApp
         shell: pwsh
         run: |
-          pyinstaller --name LeaveApp --onedir --console `
+          pyinstaller --clean --noconfirm `
+            --name LeaveApp `
+            --onedir `
+            --console `
             --add-data "app/templates;app/templates" `
             --add-data "app/static;app/static" `
             app.py
 
-      - name: Copy configuration file
+      - name: Copy configuration and PDF template
         shell: pwsh
         run: |
           Copy-Item config.json dist/LeaveApp/config.json
+          Copy-Item leave_request_template.pdf dist/LeaveApp/leave_request_template.pdf
 
       - name: Verify packaged files
         shell: pwsh
         run: |
-          if (!(Test-Path "dist/LeaveApp/app/templates/base.html")) {
-            throw "Missing base.html!"
+          $requiredFiles = @(
+            "dist/LeaveApp/LeaveApp.exe",
+            "dist/LeaveApp/config.json",
+            "dist/LeaveApp/leave_request_template.pdf",
+            "dist/LeaveApp/_internal/app/templates/base.html",
+            "dist/LeaveApp/_internal/app/static/css/style.css"
+          )
+
+          foreach ($file in $requiredFiles) {
+            if (!(Test-Path $file)) {
+              throw "Missing required file: $file"
+            }
+
+            Write-Host "Verified: $file"
           }
 
-          if (!(Test-Path "dist/LeaveApp/app/static/css/style.css")) {
-            throw "Missing style.css!"
-          }
-
-          if (!(Test-Path "dist/LeaveApp/config.json")) {
-            throw "Missing config.json!"
-          }
+          Write-Host "All application files verified successfully!"
 
       - name: Create ZIP
         shell: pwsh
         run: |
-          Compress-Archive -Path dist/LeaveApp -DestinationPath dist/LeaveApp.zip
+          Compress-Archive `
+            -Path dist/LeaveApp `
+            -DestinationPath dist/LeaveApp.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
