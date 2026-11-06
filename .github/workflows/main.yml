@@ -43,7 +43,6 @@ jobs:
         shell: pwsh
         run: |
           Copy-Item config.json dist/LeaveApp/config.json
-          Copy-Item leave_request_template.pdf dist/LeaveApp/leave_request_template.pdf
 
       - name: Verify packaged files
         shell: pwsh
@@ -51,7 +50,6 @@ jobs:
           $requiredFiles = @(
             "dist/LeaveApp/LeaveApp.exe",
             "dist/LeaveApp/config.json",
-            "dist/LeaveApp/leave_request_template.pdf",
             "dist/LeaveApp/_internal/app/templates/base.html",
             "dist/LeaveApp/_internal/app/static/css/style.css"
           )
